@@ -1,0 +1,49 @@
+name: movies_project
+description: "Aplicación de catálogo de películas - Noche de Cine"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Gestión de Estado
+  provider: ^6.1.2
+
+  # Bloqueo de Captura de Pantalla (Android)
+  #flutter_windowmanager: ^0.2.0
+
+  # Navegación
+  go_router: ^14.1.0
+
+  # Cliente HTTP para API
+  http: ^1.2.1
+
+  # Variables de entorno
+  flutter_dotenv: ^5.1.0
+
+  # Carga de imágenes de red con caché
+  cached_network_image: ^3.3.1
+
+  # Base de datos local SQLite
+  sqflite: ^2.3.3
+  path: ^1.9.0
+
+  # Iconos de Cupertino
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets para variables de entorno
+  assets:
+    - .env

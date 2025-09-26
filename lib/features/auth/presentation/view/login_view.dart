@@ -1,0 +1,211 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../core/config/theme.dart';
+import '../viewmodel/auth_viewmodel.dart';
+
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(),
+                const SizedBox(height: 40),
+                _buildEmailField(),
+                const SizedBox(height: 16),
+                _buildPasswordField(),
+                const SizedBox(height: 24),
+                _buildLoginButton(),
+                const SizedBox(height: 16),
+                _buildErrorMessage(),
+                const SizedBox(height: 24),
+                _buildRegisterLink(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Icon(
+          Icons.movie_outlined,
+          size: 80,
+          color: AppTheme.vibrantAmber,
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Noche de Cine',
+          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+            color: AppTheme.vibrantAmber,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Inicia sesión para continuar',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(
+        labelText: 'Email',
+        prefixIcon: Icon(Icons.email_outlined),
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'El email es requerido';
+        }
+        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+          return 'Ingresa un email válido';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        labelText: 'Contraseña',
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'La contraseña es requerida';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return Consumer<AuthViewModel>(
+      builder: (context, authViewModel, child) {
+        return ElevatedButton(
+          onPressed: authViewModel.isLoading ? null : _handleLogin,
+          child: authViewModel.isLoading
+              ? const SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+              : const Text('Iniciar Sesión'),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorMessage() {
+    return Consumer<AuthViewModel>(
+      builder: (context, authViewModel, child) {
+        if (authViewModel.errorMessage != null) {
+          return Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    authViewModel.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.red),
+                  onPressed: authViewModel.clearError,
+                ),
+              ],
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildRegisterLink() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '¿No tienes cuenta? ',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        TextButton(
+          onPressed: () => context.go('/register'),
+          child: Text(
+            'Regístrate',
+            style: TextStyle(color: AppTheme.vibrantAmber),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleLogin() {
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<AuthViewModel>().login(
+        context: context,
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+    }
+  }
+}
