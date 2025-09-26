@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
 import '../viewmodel/auth_viewmodel.dart';
@@ -13,6 +14,7 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  final noscreenshot = NoScreenshot.instance;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -24,12 +26,11 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   void initState() {
     super.initState();
-    // Screenshot blocking removido temporalmente por compatibilidad
+    noscreenshot.screenshotOff();
   }
 
   @override
   void dispose() {
-    // Screenshot blocking removido temporalmente por compatibilidad
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();

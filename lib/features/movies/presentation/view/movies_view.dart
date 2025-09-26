@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
 import '../../../auth/presentation/viewmodel/auth_viewmodel.dart';
@@ -16,17 +17,17 @@ class MoviesView extends StatefulWidget {
 
 class _MoviesViewState extends State<MoviesView> {
   final ScrollController _scrollController = ScrollController();
+  final noscreenshot = NoScreenshot.instance;
 
   @override
   void initState() {
     super.initState();
-    // Screenshot blocking removido temporalmente por compatibilidad
+    noscreenshot.screenshotOff();
     _setupScrollListener();
   }
 
   @override
   void dispose() {
-    // Screenshot blocking removido temporalmente por compatibilidad
     _scrollController.dispose();
     super.dispose();
   }

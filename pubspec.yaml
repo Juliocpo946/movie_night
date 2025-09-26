@@ -15,7 +15,7 @@ dependencies:
   provider: ^6.1.2
 
   # Bloqueo de Captura de Pantalla (Android)
-  #flutter_windowmanager: ^0.2.0
+  no_screenshot: ^0.3.1
 
   # Navegación
   go_router: ^14.1.0
