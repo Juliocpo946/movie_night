@@ -63,8 +63,8 @@ Para clonar y ejecutar este proyecto localmente, sigue estos pasos:
 1.  **Clonar el repositorio:**
 
     ```bash
-    git clone https://github.com/tu-usuario/noche-de-cine.git
-    cd noche-de-cine
+    git clone https://github.com/Juliocpo946/movie_night.git
+    cd movie_night
     ```
 
 2.  **Obtener dependencias:**
