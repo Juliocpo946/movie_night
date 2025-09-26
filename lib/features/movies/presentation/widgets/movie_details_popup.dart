@@ -1,0 +1,150 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import '../../../../core/config/theme.dart';
+import '../../domain/entities/movie.dart';
+
+class MovieDetailsPopup extends StatelessWidget {
+  final Movie movie;
+
+  const MovieDetailsPopup({super.key, required this.movie});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: AppTheme.softCharcoal,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 600),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildBackdropImage(context),
+              _buildMovieInfo(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackdropImage(BuildContext context) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16.0),
+            topRight: Radius.circular(16.0),
+          ),
+          child: CachedNetworkImage(
+            imageUrl: movie.fullBackdropUrl,
+            fit: BoxFit.cover,
+            height: 200,
+            placeholder: (context, url) =>
+            const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Container(
+              height: 200,
+              color: AppTheme.midnightBlue,
+              child: const Icon(Icons.movie_creation_outlined,
+                  color: AppTheme.lightGray, size: 50),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8,
+          child: IconButton(
+            icon: const CircleAvatar(
+              backgroundColor: Colors.black54,
+              child: Icon(Icons.close, color: Colors.white),
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMovieInfo() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            movie.title,
+            style: const TextStyle(
+              color: AppTheme.pureWhite,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _buildRatingSection(),
+              const SizedBox(width: 16),
+              _buildYearSection(),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Sinopsis',
+            style: TextStyle(
+              color: AppTheme.pureWhite,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            movie.overview.isNotEmpty ? movie.overview : 'No disponible.',
+            style: const TextStyle(
+              color: AppTheme.lightGray,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRatingSection() {
+    return Row(
+      children: [
+        const Icon(Icons.star, color: AppTheme.vibrantAmber, size: 20),
+        const SizedBox(width: 4),
+        Text(
+          movie.formattedRating,
+          style: const TextStyle(
+            color: AppTheme.pureWhite,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Text('/10',
+            style: TextStyle(color: AppTheme.lightGray, fontSize: 14)),
+      ],
+    );
+  }
+
+  Widget _buildYearSection() {
+    if (movie.releaseYear == 0) return const SizedBox.shrink();
+    return Row(
+      children: [
+        const Icon(Icons.calendar_today, color: AppTheme.lightGray, size: 16),
+        const SizedBox(width: 4),
+        Text(
+          movie.releaseYear.toString(),
+          style: const TextStyle(
+            color: AppTheme.lightGray,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+}

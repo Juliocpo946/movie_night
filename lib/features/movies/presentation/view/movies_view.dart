@@ -16,53 +16,38 @@ class MoviesView extends StatefulWidget {
 }
 
 class _MoviesViewState extends State<MoviesView> {
-  final ScrollController _scrollController = ScrollController();
   final noscreenshot = NoScreenshot.instance;
 
   @override
   void initState() {
     super.initState();
     noscreenshot.screenshotOff();
-    _setupScrollListener();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _setupScrollListener() {
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        final moviesViewModel = context.read<MoviesViewModel>();
-        if (!moviesViewModel.isLoading &&
-            moviesViewModel.hasMorePages &&
-            moviesViewModel.searchQuery.isEmpty) {
-          moviesViewModel.loadPopularMovies(loadMore: true);
-        }
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          _buildSearchSection(),
-          _buildErrorMessage(),
-          Expanded(
-            child: _buildMoviesContent(),
-          ),
-        ],
+      body: RefreshIndicator(
+        onRefresh: context.read<MoviesViewModel>().refresh,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildSearchSection()),
+            SliverToBoxAdapter(child: _buildErrorMessage()),
+            const MovieGrid(),
+          ],
+        ),
       ),
     );
   }
 
   PreferredSizeWidget _buildAppBar() {
+    // ... (Este método no cambia)
     return AppBar(
       title: Row(
         children: [
@@ -148,7 +133,7 @@ class _MoviesViewState extends State<MoviesView> {
       builder: (context, moviesViewModel, child) {
         if (moviesViewModel.errorMessage != null) {
           return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.red.withOpacity(0.1),
@@ -174,19 +159,6 @@ class _MoviesViewState extends State<MoviesView> {
           );
         }
         return const SizedBox.shrink();
-      },
-    );
-  }
-
-  Widget _buildMoviesContent() {
-    return Consumer<MoviesViewModel>(
-      builder: (context, moviesViewModel, child) {
-        return RefreshIndicator(
-          onRefresh: moviesViewModel.refresh,
-          child: MovieGrid(
-            scrollController: _scrollController,
-          ),
-        );
       },
     );
   }

@@ -26,4 +26,5 @@ class MovieRepositoryImpl implements MovieRepository {
       throw Exception('Error al buscar películas: ${e.toString()}');
     }
   }
+
 }

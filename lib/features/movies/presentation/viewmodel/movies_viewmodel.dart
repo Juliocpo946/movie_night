@@ -12,8 +12,10 @@ class MoviesViewModel extends ChangeNotifier {
 
   List<Movie> _popularMovies = [];
   List<Movie> _searchResults = [];
+  List<Movie> _upcomingMovies = [];
   bool _isLoading = false;
   bool _isSearching = false;
+  bool _isLoadingUpcoming = false;
   String? _errorMessage;
   String _searchQuery = '';
   int _currentPage = 1;
@@ -21,7 +23,7 @@ class MoviesViewModel extends ChangeNotifier {
 
   MoviesViewModel() {
     _initializeUseCases();
-    loadPopularMovies();
+    loadInitialData();
   }
 
   void _initializeUseCases() {
@@ -35,12 +37,19 @@ class MoviesViewModel extends ChangeNotifier {
   // Getters
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get searchResults => _searchResults;
+  List<Movie> get upcomingMovies => _upcomingMovies;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
+  bool get isLoadingUpcoming => _isLoadingUpcoming;
   String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
   bool get hasMorePages => _hasMorePages;
   int get currentPage => _currentPage;
+
+  // Carga inicial de datos
+  void loadInitialData() {
+    loadPopularMovies();
+  }
 
   // Métodos públicos
   Future<void> loadPopularMovies({bool loadMore = false}) async {
@@ -73,6 +82,7 @@ class MoviesViewModel extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
 
   Future<void> searchMovies(String query) async {
     if (query.trim() == _searchQuery.trim()) return;
@@ -111,12 +121,19 @@ class MoviesViewModel extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    await loadPopularMovies();
+    await Future.wait([
+      loadPopularMovies(),
+    ]);
   }
 
   // Métodos privados
   void _setLoading(bool loading) {
     _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _setLoadingUpcoming(bool loading) {
+    _isLoadingUpcoming = loading;
     notifyListeners();
   }
 

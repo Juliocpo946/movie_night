@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/config/theme.dart';
 import '../../domain/entities/movie.dart';
+import 'movie_details_popup.dart'; // <-- 1. Importa el nuevo widget
 
 class MoviePosterCard extends StatelessWidget {
   final Movie movie;
@@ -14,24 +14,38 @@ class MoviePosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 4,
-            child: _buildPosterImage(),
-          ),
-          Expanded(
-            flex: 2,
-            child: _buildMovieInfo(),
-          ),
-        ],
+    // 2. Envuelve el Card con GestureDetector
+    return GestureDetector(
+      onTap: () {
+        // 3. Muestra el pop-up al tocar la tarjeta
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return MovieDetailsPopup(movie: movie);
+          },
+        );
+      },
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 4,
+              child: _buildPosterImage(),
+            ),
+            Expanded(
+              flex: 2,
+              child: _buildMovieInfo(),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  // ... (el resto del código de _buildPosterImage, _buildMovieInfo, etc., permanece igual)
+  // ...
   Widget _buildPosterImage() {
     return Container(
       width: double.infinity,
