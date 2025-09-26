@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
-import '../viewmodel/auth_viewmodel.dart';
+import '../viewmodel/register_viewmodel.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -205,11 +205,11 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Widget _buildRegisterButton() {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, child) {
+    return Consumer<RegisterViewModel>( // <-- Cambio
+      builder: (context, registerViewModel, child) {
         return ElevatedButton(
-          onPressed: authViewModel.isLoading ? null : _handleRegister,
-          child: authViewModel.isLoading
+          onPressed: registerViewModel.isLoading ? null : _handleRegister,
+          child: registerViewModel.isLoading
               ? const SizedBox(
             height: 20,
             width: 20,
@@ -222,9 +222,9 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Widget _buildErrorMessage() {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, child) {
-        if (authViewModel.errorMessage != null) {
+    return Consumer<RegisterViewModel>( // <-- Cambio
+      builder: (context, registerViewModel, child) {
+        if (registerViewModel.errorMessage != null) {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -238,13 +238,13 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    authViewModel.errorMessage!,
+                    registerViewModel.errorMessage!,
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: authViewModel.clearError,
+                  onPressed: registerViewModel.clearError,
                 ),
               ],
             ),
@@ -276,7 +276,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   void _handleRegister() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthViewModel>().register(
+      context.read<RegisterViewModel>().register(
         context: context,
         name: _nameController.text,
         email: _emailController.text,

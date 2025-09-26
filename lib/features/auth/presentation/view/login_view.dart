@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
-import '../viewmodel/auth_viewmodel.dart';
+import '../viewmodel/login_viewmodel.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -138,11 +138,11 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildLoginButton() {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, child) {
+    return Consumer<LoginViewModel>( // <-- Cambio
+      builder: (context, loginViewModel, child) {
         return ElevatedButton(
-          onPressed: authViewModel.isLoading ? null : _handleLogin,
-          child: authViewModel.isLoading
+          onPressed: loginViewModel.isLoading ? null : _handleLogin,
+          child: loginViewModel.isLoading
               ? const SizedBox(
             height: 20,
             width: 20,
@@ -155,9 +155,9 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildErrorMessage() {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, child) {
-        if (authViewModel.errorMessage != null) {
+    return Consumer<LoginViewModel>( // <-- Cambio
+      builder: (context, loginViewModel, child) {
+        if (loginViewModel.errorMessage != null) {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -171,13 +171,13 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    authViewModel.errorMessage!,
+                    loginViewModel.errorMessage!,
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: authViewModel.clearError,
+                  onPressed: loginViewModel.clearError,
                 ),
               ],
             ),
@@ -209,7 +209,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _handleLogin() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthViewModel>().login(
+      context.read<LoginViewModel>().login(
         context: context,
         email: _emailController.text,
         password: _passwordController.text,

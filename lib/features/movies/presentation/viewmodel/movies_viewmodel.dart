@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
 import '../../domain/entities/movie.dart';
+import '../../../auth/domain/entities/user.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
 
@@ -10,12 +12,11 @@ class MoviesViewModel extends ChangeNotifier {
   late final GetPopularMovies _getPopularMovies;
   late final SearchMovies _searchMovies;
 
+  User? _currentUser;
   List<Movie> _popularMovies = [];
   List<Movie> _searchResults = [];
-  List<Movie> _upcomingMovies = [];
   bool _isLoading = false;
   bool _isSearching = false;
-  bool _isLoadingUpcoming = false;
   String? _errorMessage;
   String _searchQuery = '';
   int _currentPage = 1;
@@ -29,53 +30,59 @@ class MoviesViewModel extends ChangeNotifier {
   void _initializeUseCases() {
     final remoteDatasource = MovieRemoteDatasource();
     final repository = MovieRepositoryImpl(remoteDatasource);
-
     _getPopularMovies = GetPopularMovies(repository);
     _searchMovies = SearchMovies(repository);
   }
 
   // Getters
+  User? get currentUser => _currentUser;
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get searchResults => _searchResults;
-  List<Movie> get upcomingMovies => _upcomingMovies;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
-  bool get isLoadingUpcoming => _isLoadingUpcoming;
   String? get errorMessage => _errorMessage;
   String get searchQuery => _searchQuery;
   bool get hasMorePages => _hasMorePages;
-  int get currentPage => _currentPage;
 
-  // Carga inicial de datos
+  void setCurrentUser(User user) {
+    _currentUser = user;
+    notifyListeners();
+  }
+
+  void logout(BuildContext context) {
+    _currentUser = null;
+    _popularMovies.clear();
+    _searchResults.clear();
+    _searchQuery = '';
+    notifyListeners();
+    context.go('/login');
+  }
+
+  // --- Métodos de Lógica de UI ---
+
   void loadInitialData() {
     loadPopularMovies();
   }
 
-  // Métodos públicos
   Future<void> loadPopularMovies({bool loadMore = false}) async {
     if (_isLoading) return;
-
     if (!loadMore) {
       _currentPage = 1;
       _popularMovies.clear();
       _hasMorePages = true;
     }
-
     _setLoading(true);
-    _clearError();
+    clearError(); // <-- Usa el método público
 
     try {
       final movies = await _getPopularMovies.call(page: _currentPage);
-
       if (loadMore) {
         _popularMovies.addAll(movies);
       } else {
         _popularMovies = movies;
       }
-
       _hasMorePages = movies.isNotEmpty && movies.length >= 20;
       if (_hasMorePages) _currentPage++;
-
     } catch (e) {
       _setError(e.toString());
     } finally {
@@ -83,10 +90,8 @@ class MoviesViewModel extends ChangeNotifier {
     }
   }
 
-
   Future<void> searchMovies(String query) async {
     if (query.trim() == _searchQuery.trim()) return;
-
     _searchQuery = query.trim();
 
     if (_searchQuery.isEmpty) {
@@ -94,9 +99,8 @@ class MoviesViewModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
-
     _setSearching(true);
-    _clearError();
+    clearError();
 
     try {
       final results = await _searchMovies.call(_searchQuery);
@@ -121,19 +125,12 @@ class MoviesViewModel extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    await Future.wait([
-      loadPopularMovies(),
-    ]);
+    await loadPopularMovies();
   }
 
-  // Métodos privados
+  // Métodos privados para manejo de estado interno
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setLoadingUpcoming(bool loading) {
-    _isLoadingUpcoming = loading;
     notifyListeners();
   }
 
@@ -145,9 +142,5 @@ class MoviesViewModel extends ChangeNotifier {
   void _setError(String error) {
     _errorMessage = error;
     notifyListeners();
-  }
-
-  void _clearError() {
-    _errorMessage = null;
   }
 }

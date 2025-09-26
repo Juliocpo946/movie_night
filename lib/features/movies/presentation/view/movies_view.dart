@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
-import '../../../auth/presentation/viewmodel/auth_viewmodel.dart';
 import '../viewmodel/movies_viewmodel.dart';
 import '../widgets/movie_grid.dart';
 import '../widgets/search_bar_widget.dart';
@@ -47,7 +46,6 @@ class _MoviesViewState extends State<MoviesView> {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    // ... (Este método no cambia)
     return AppBar(
       title: Row(
         children: [
@@ -61,13 +59,13 @@ class _MoviesViewState extends State<MoviesView> {
         ],
       ),
       actions: [
-        Consumer<AuthViewModel>(
-          builder: (context, authViewModel, child) {
+        Consumer<MoviesViewModel>( // <-- Cambio
+          builder: (context, moviesViewModel, child) {
             return PopupMenuButton<String>(
               icon: CircleAvatar(
                 backgroundColor: AppTheme.vibrantAmber,
                 child: Text(
-                  authViewModel.currentUser?.name.substring(0, 1).toUpperCase() ?? 'U',
+                  moviesViewModel.currentUser?.name.substring(0, 1).toUpperCase() ?? 'U', // <-- Cambio
                   style: const TextStyle(
                     color: AppTheme.midnightBlue,
                     fontWeight: FontWeight.bold,
@@ -76,7 +74,7 @@ class _MoviesViewState extends State<MoviesView> {
               ),
               onSelected: (value) {
                 if (value == 'logout') {
-                  authViewModel.logout(context);
+                  moviesViewModel.logout(context); // <-- Cambio
                 }
               },
               itemBuilder: (context) => [
@@ -86,14 +84,14 @@ class _MoviesViewState extends State<MoviesView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        authViewModel.currentUser?.name ?? 'Usuario',
+                        moviesViewModel.currentUser?.name ?? 'Usuario', // <-- Cambio
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppTheme.pureWhite,
                         ),
                       ),
                       Text(
-                        authViewModel.currentUser?.email ?? '',
+                        moviesViewModel.currentUser?.email ?? '', // <-- Cambio
                         style: const TextStyle(
                           color: AppTheme.lightGray,
                           fontSize: 12,
@@ -152,7 +150,7 @@ class _MoviesViewState extends State<MoviesView> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: moviesViewModel.clearError,
+                  onPressed: context.read<MoviesViewModel>().clearError,
                 ),
               ],
             ),

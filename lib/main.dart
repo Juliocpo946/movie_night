@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'core/config/router.dart';
 import 'core/config/theme.dart';
 import 'core/services/database_helper.dart';
-import 'features/auth/presentation/viewmodel/auth_viewmodel.dart';
+import 'features/auth/presentation/viewmodel/login_viewmodel.dart';
+import 'features/auth/presentation/viewmodel/register_viewmodel.dart';
 import 'features/movies/presentation/viewmodel/movies_viewmodel.dart';
 
 Future<void> main() async {
@@ -28,10 +29,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => AuthViewModel(),
+          create: (context) => MoviesViewModel(),
         ),
         ChangeNotifierProvider(
-          create: (context) => MoviesViewModel(),
+          create: (context) => LoginViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RegisterViewModel(),
         ),
       ],
       child: MaterialApp.router(
