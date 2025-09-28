@@ -59,13 +59,13 @@ class _MoviesViewState extends State<MoviesView> {
         ],
       ),
       actions: [
-        Consumer<MoviesViewModel>( // <-- Cambio
+        Consumer<MoviesViewModel>(
           builder: (context, moviesViewModel, child) {
             return PopupMenuButton<String>(
               icon: CircleAvatar(
                 backgroundColor: AppTheme.vibrantAmber,
                 child: Text(
-                  moviesViewModel.currentUser?.name.substring(0, 1).toUpperCase() ?? 'U', // <-- Cambio
+                  moviesViewModel.currentUser?.name.substring(0, 1).toUpperCase() ?? 'U',
                   style: const TextStyle(
                     color: AppTheme.midnightBlue,
                     fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class _MoviesViewState extends State<MoviesView> {
               ),
               onSelected: (value) {
                 if (value == 'logout') {
-                  moviesViewModel.logout(context); // <-- Cambio
+                  moviesViewModel.logout(context);
                 }
               },
               itemBuilder: (context) => [
@@ -84,14 +84,14 @@ class _MoviesViewState extends State<MoviesView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        moviesViewModel.currentUser?.name ?? 'Usuario', // <-- Cambio
+                        moviesViewModel.currentUser?.name ?? 'Usuario',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppTheme.pureWhite,
                         ),
                       ),
                       Text(
-                        moviesViewModel.currentUser?.email ?? '', // <-- Cambio
+                        moviesViewModel.currentUser?.email ?? '',
                         style: const TextStyle(
                           color: AppTheme.lightGray,
                           fontSize: 12,

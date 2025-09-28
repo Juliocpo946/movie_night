@@ -1,7 +1,3 @@
-Claro, aquí tienes una plantilla profesional para el archivo `README.md` de tu repositorio en GitHub.
-
------
-
 # Noche de Cine: Aplicación de Catálogo de Películas
 
 ## Introducción

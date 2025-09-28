@@ -48,7 +48,6 @@ class LoginViewModel extends ChangeNotifier {
       );
 
       if (context.mounted) {
-        // Actualiza el usuario en MoviesViewModel
         context.read<MoviesViewModel>().setCurrentUser(user);
         context.go('/movies');
       }

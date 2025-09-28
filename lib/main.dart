@@ -12,10 +12,8 @@ import 'features/movies/presentation/viewmodel/movies_viewmodel.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Cargar variables de entorno
   await dotenv.load(fileName: ".env");
 
-  // Inicializar base de datos
   await DatabaseHelper().database;
 
   runApp(const MyApp());

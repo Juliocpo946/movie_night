@@ -58,8 +58,6 @@ class MoviesViewModel extends ChangeNotifier {
     context.go('/login');
   }
 
-  // --- Métodos de Lógica de UI ---
-
   void loadInitialData() {
     loadPopularMovies();
   }
@@ -72,7 +70,7 @@ class MoviesViewModel extends ChangeNotifier {
       _hasMorePages = true;
     }
     _setLoading(true);
-    clearError(); // <-- Usa el método público
+    clearError();
 
     try {
       final movies = await _getPopularMovies.call(page: _currentPage);
@@ -128,7 +126,6 @@ class MoviesViewModel extends ChangeNotifier {
     await loadPopularMovies();
   }
 
-  // Métodos privados para manejo de estado interno
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
