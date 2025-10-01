@@ -24,9 +24,7 @@ class FavoritesRemoteDatasource {
 
     final response = await _client.post(
       url,
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
       body: json.encode({
         'media_type': 'movie',
         'media_id': movieId,
@@ -49,16 +47,12 @@ class FavoritesRemoteDatasource {
 
     final response = await _client.get(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
     );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> results = data['results'] as List<dynamic>;
-
       return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).toList();
     } else {
       throw ServerException(message: 'Error al obtener películas favoritas: ${response.body}');

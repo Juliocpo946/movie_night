@@ -65,12 +65,7 @@ class FavoritesViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _markAsFavorite(
-        _currentUser!.id!,
-        _sessionId!,
-        movie.id,
-        !isCurrentlyFavorite,
-      );
+      await _markAsFavorite(_currentUser!.id!, _sessionId!, movie.id, !isCurrentlyFavorite);
     } catch (e) {
       _favoriteMovies = originalFavorites;
       _failure = ServerFailure(message: e.toString());

@@ -1,6 +1,7 @@
 import '../../../../shared/domain/entities/movie.dart';
-import '../../data/repositories/favorites_repository.dart';
-import '../../data/datasources/favorites_remote_datasource.dart';
+import '../../domain/repositories/favorites_repository.dart';
+import '../datasources/favorites_remote_datasource.dart';
+import '../../../movies/data/models/movie_model.dart';
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
   final FavoritesRemoteDatasource remoteDatasource;
