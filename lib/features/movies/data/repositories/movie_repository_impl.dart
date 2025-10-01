@@ -37,4 +37,15 @@ class MovieRepositoryImpl implements MovieRepository {
       throw Exception('Error al buscar películas: ${e.toString()}');
     }
   }
+
+  // NUEVAS IMPLEMENTACIONES
+  @override
+  Future<void> addRating(String sessionId, int movieId, double rating) async {
+    await _remoteDatasource.addRating(sessionId, movieId, rating);
+  }
+
+  @override
+  Future<void> deleteRating(String sessionId, int movieId) async {
+    await _remoteDatasource.deleteRating(sessionId, movieId);
+  }
 }

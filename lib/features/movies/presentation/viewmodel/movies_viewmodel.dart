@@ -9,18 +9,23 @@ import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
 import '../../domain/usecases/mark_as_favorite.dart';
 import '../../domain/usecases/get_favorites.dart';
+import '../../domain/usecases/add_rating.dart'; // Importar
+import '../../domain/usecases/delete_rating.dart'; // Importar
 
 class MoviesViewModel extends ChangeNotifier {
   late final GetPopularMovies _getPopularMovies;
   late final SearchMovies _searchMovies;
   late final MarkAsFavorite _markAsFavorite;
   late final GetFavorites _getFavorites;
+  late final AddRating _addRating; // Añadir
+  late final DeleteRating _deleteRating; // Añadir
 
   User? _currentUser;
   String? _sessionId;
   List<Movie> _popularMovies = [];
   List<Movie> _searchResults = [];
   List<Movie> _favoriteMovies = [];
+  final Map<int, double> _ratedMovies = {}; // Estado para calificaciones
   bool _isLoading = false;
   bool _isSearching = false;
   String? _errorMessage;
@@ -40,6 +45,8 @@ class MoviesViewModel extends ChangeNotifier {
     _searchMovies = SearchMovies(repository);
     _markAsFavorite = MarkAsFavorite(repository);
     _getFavorites = GetFavorites(repository);
+    _addRating = AddRating(repository); // Inicializar
+    _deleteRating = DeleteRating(repository); // Inicializar
   }
 
   User? get currentUser => _currentUser;
@@ -47,6 +54,7 @@ class MoviesViewModel extends ChangeNotifier {
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get searchResults => _searchResults;
   List<Movie> get favoriteMovies => _favoriteMovies;
+  Map<int, double> get ratedMovies => _ratedMovies;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
   String? get errorMessage => _errorMessage;
@@ -69,6 +77,7 @@ class MoviesViewModel extends ChangeNotifier {
     _popularMovies.clear();
     _searchResults.clear();
     _favoriteMovies.clear();
+    _ratedMovies.clear();
     _searchQuery = '';
     notifyListeners();
     context.go('/login');
@@ -113,6 +122,36 @@ class MoviesViewModel extends ChangeNotifier {
     } catch (e) {
       _setError(e.toString());
     } finally {
+      notifyListeners();
+    }
+  }
+
+  // NUEVOS MÉTODOS PARA CALIFICACIÓN
+  Future<void> rateMovie(int movieId, double rating) async {
+    if (_sessionId == null) return;
+    _ratedMovies[movieId] = rating;
+    notifyListeners();
+    try {
+      await _addRating(_sessionId!, movieId, rating);
+    } catch (e) {
+      _ratedMovies.remove(movieId);
+      _setError(e.toString());
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteMovieRating(int movieId) async {
+    if (_sessionId == null) return;
+    final originalRating = _ratedMovies[movieId];
+    _ratedMovies.remove(movieId);
+    notifyListeners();
+    try {
+      await _deleteRating(_sessionId!, movieId);
+    } catch (e) {
+      if (originalRating != null) {
+        _ratedMovies[movieId] = originalRating;
+      }
+      _setError(e.toString());
       notifyListeners();
     }
   }

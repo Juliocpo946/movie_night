@@ -130,6 +130,40 @@ class MovieRemoteDatasource {
     }
   }
 
+  // NUEVOS MÉTODOS
+  Future<void> addRating(String sessionId, int movieId, double rating) async {
+    final url = Uri.parse('$_baseUrl/movie/$movieId/rating').replace(queryParameters: {
+      'api_key': _apiKey,
+      'session_id': sessionId,
+    });
+
+    final response = await _client.post(
+      url,
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: json.encode({'value': rating}),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Error al añadir la calificación: ${response.body}');
+    }
+  }
+
+  Future<void> deleteRating(String sessionId, int movieId) async {
+    final url = Uri.parse('$_baseUrl/movie/$movieId/rating').replace(queryParameters: {
+      'api_key': _apiKey,
+      'session_id': sessionId,
+    });
+
+    final response = await _client.delete(
+      url,
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error al eliminar la calificación: ${response.body}');
+    }
+  }
+
   void dispose() {
     _client.close();
   }

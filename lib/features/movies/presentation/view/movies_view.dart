@@ -65,7 +65,8 @@ class _MoviesViewState extends State<MoviesView> {
       actions: [
         IconButton(
           icon: const Icon(Icons.favorite_border, color: AppTheme.lightGray),
-          onPressed: () => context.go('/favorites'),
+          // ***** CAMBIO APLICADO AQUÍ *****
+          onPressed: () => context.push('/favorites'), // Cambiado de .go() a .push()
         ),
         Consumer<MoviesViewModel>(
           builder: (context, moviesViewModel, child) {

@@ -117,7 +117,7 @@ class MovieDetailsPopup extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              _buildRatingSection(),
+              _buildRatingInfo(),
               const SizedBox(width: 16),
               _buildYearSection(),
             ],
@@ -139,12 +139,14 @@ class MovieDetailsPopup extends StatelessWidget {
               fontSize: 14,
             ),
           ),
+          const SizedBox(height: 24),
+          _buildUserRatingSection(context),
         ],
       ),
     );
   }
 
-  Widget _buildRatingSection() {
+  Widget _buildRatingInfo() {
     return Row(
       children: [
         const Icon(Icons.star, color: AppTheme.vibrantAmber, size: 20),
@@ -176,6 +178,62 @@ class MovieDetailsPopup extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildUserRatingSection(BuildContext context) {
+    return Consumer<MoviesViewModel>(
+      builder: (context, viewModel, child) {
+        final userRating = viewModel.ratedMovies[movie.id];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tu Calificación',
+              style: TextStyle(
+                color: AppTheme.pureWhite,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(5, (index) {
+                    final ratingValue = (index + 1) * 2.0;
+                    return IconButton(
+                      // ***** SOLUCIÓN APLICADA AQUÍ *****
+                      iconSize: 28, // Tamaño del ícono reducido
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0), // Padding horizontal reducido
+                      constraints: const BoxConstraints(), // Elimina el tamaño mínimo del botón
+                      icon: Icon(
+                        userRating != null && userRating >= ratingValue
+                            ? Icons.star
+                            : Icons.star_border,
+                        color: AppTheme.vibrantAmber,
+                      ),
+                      onPressed: () {
+                        viewModel.rateMovie(movie.id, ratingValue);
+                      },
+                    );
+                  }),
+                ),
+                if (userRating != null)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    onPressed: () {
+                      viewModel.deleteMovieRating(movie.id);
+                    },
+                  )
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }
