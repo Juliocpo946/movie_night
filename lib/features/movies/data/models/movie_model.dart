@@ -1,4 +1,4 @@
-import '../../domain/entities/movie.dart';
+import '../../../../shared/domain/entities/movie.dart';
 
 class MovieModel extends Movie {
   const MovieModel({

@@ -1,7 +1,6 @@
 import '../../../../shared/domain/entities/movie.dart';
 import '../../domain/repositories/favorites_repository.dart';
 import '../datasources/favorites_remote_datasource.dart';
-import '../../../movies/data/models/movie_model.dart';
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
   final FavoritesRemoteDatasource remoteDatasource;
@@ -16,6 +15,6 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   @override
   Future<List<Movie>> getFavorites(int accountId, String sessionId) async {
     final movieModels = await remoteDatasource.getFavoriteMovies(accountId, sessionId);
-    return movieModels.where((model) => model != null).map((model) => model!.toEntity()).toList();
+    return movieModels.map((model) => model.toEntity()).toList();
   }
 }

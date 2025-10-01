@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
-import '../../../../shared/domain/entities/movie.dart';
+import '../../../../shared/domain/entities/movie.dart'; // Corregido
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
