@@ -16,7 +16,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final noscreenshot = NoScreenshot.instance;
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
@@ -28,7 +28,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -47,7 +47,7 @@ class _LoginViewState extends State<LoginView> {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 40),
-                _buildEmailField(),
+                _buildUsernameField(),
                 const SizedBox(height: 16),
                 _buildPasswordField(),
                 const SizedBox(height: 24),
@@ -83,27 +83,23 @@ class _LoginViewState extends State<LoginView> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Inicia sesión para continuar',
+          'Inicia sesión con tu cuenta de TMDB',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildUsernameField() {
     return TextFormField(
-      controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
+      controller: _usernameController,
       decoration: const InputDecoration(
-        labelText: 'Email',
-        prefixIcon: Icon(Icons.email_outlined),
+        labelText: 'Nombre de usuario de TMDB',
+        prefixIcon: Icon(Icons.person_outline),
       ),
       validator: (value) {
         if (value?.isEmpty ?? true) {
-          return 'El email es requerido';
-        }
-        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-          return 'Ingresa un email válido';
+          return 'El nombre de usuario es requerido';
         }
         return null;
       },
@@ -138,7 +134,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildLoginButton() {
-    return Consumer<LoginViewModel>( // <-- Cambio
+    return Consumer<LoginViewModel>(
       builder: (context, loginViewModel, child) {
         return ElevatedButton(
           onPressed: loginViewModel.isLoading ? null : _handleLogin,
@@ -155,7 +151,7 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _buildErrorMessage() {
-    return Consumer<LoginViewModel>( // <-- Cambio
+    return Consumer<LoginViewModel>(
       builder: (context, loginViewModel, child) {
         if (loginViewModel.errorMessage != null) {
           return Container(
@@ -199,7 +195,7 @@ class _LoginViewState extends State<LoginView> {
         TextButton(
           onPressed: () => context.go('/register'),
           child: Text(
-            'Regístrate',
+            'Regístrate en TMDB',
             style: TextStyle(color: AppTheme.vibrantAmber),
           ),
         ),
@@ -211,7 +207,7 @@ class _LoginViewState extends State<LoginView> {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<LoginViewModel>().login(
         context: context,
-        email: _emailController.text,
+        username: _usernameController.text,
         password: _passwordController.text,
       );
     }

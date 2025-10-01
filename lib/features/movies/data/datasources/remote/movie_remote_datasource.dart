@@ -11,14 +11,62 @@ class MovieRemoteDatasource {
 
   MovieRemoteDatasource({
     http.Client? client,
-  }) : _client = client ?? http.Client(),
+  })  : _client = client ?? http.Client(),
         _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3',
         _apiKey = dotenv.env['TMDB_API_KEY'] ?? '';
 
+  Future<void> markAsFavorite(int accountId, String sessionId, int movieId, bool isFavorite) async {
+    final url = Uri.parse('$_baseUrl/account/$accountId/favorite').replace(queryParameters: {
+      'api_key': _apiKey,
+      'session_id': sessionId,
+    });
+
+    final response = await _client.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: json.encode({
+        'media_type': 'movie',
+        'media_id': movieId,
+        'favorite': isFavorite,
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Error al marcar como favorito: ${response.body}');
+    }
+  }
+
+  Future<List<MovieModel>> getFavoriteMovies(int accountId, String sessionId) async {
+    final url = Uri.parse('$_baseUrl/account/$accountId/favorite/movies').replace(queryParameters: {
+      'api_key': _apiKey,
+      'session_id': sessionId,
+      'language': 'es-ES',
+      'sort_by': 'created_at.asc',
+    });
+
+    final response = await _client.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> results = data['results'] as List<dynamic>;
+
+      return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).toList();
+    } else {
+      throw Exception('Error al obtener películas favoritas: ${response.body}');
+    }
+  }
+
   Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
     try {
-      final url = Uri.parse('$_baseUrl/movie/popular')
-          .replace(queryParameters: {
+      final url = Uri.parse('$_baseUrl/movie/popular').replace(queryParameters: {
         'api_key': _apiKey,
         'page': page.toString(),
         'language': 'es-ES',
@@ -36,10 +84,7 @@ class MovieRemoteDatasource {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> results = data['results'] as List<dynamic>;
 
-        return results
-            .map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>))
-            .where((movie) => movie.posterPath.isNotEmpty)
-            .toList();
+        return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
       } else {
         throw Exception('Error ${response.statusCode}: ${response.reasonPhrase}');
       }
@@ -55,8 +100,7 @@ class MovieRemoteDatasource {
     }
 
     try {
-      final url = Uri.parse('$_baseUrl/search/movie')
-          .replace(queryParameters: {
+      final url = Uri.parse('$_baseUrl/search/movie').replace(queryParameters: {
         'api_key': _apiKey,
         'query': query.trim(),
         'page': page.toString(),
@@ -76,10 +120,7 @@ class MovieRemoteDatasource {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> results = data['results'] as List<dynamic>;
 
-        return results
-            .map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>))
-            .where((movie) => movie.posterPath.isNotEmpty)
-            .toList();
+        return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
       } else {
         throw Exception('Error ${response.statusCode}: ${response.reasonPhrase}');
       }

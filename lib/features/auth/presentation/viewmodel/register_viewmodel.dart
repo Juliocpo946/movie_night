@@ -1,79 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:no_screenshot/no_screenshot.dart';
+import '../../../../core/config/theme.dart';
 
-import '../../../../core/services/database_helper.dart';
-import '../../data/datasources/auth_local_datasource.dart';
-import '../../data/repositories/auth_repository_impl.dart';
-import '../../domain/usecases/register_user.dart';
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
-class RegisterViewModel extends ChangeNotifier {
-  late final RegisterUser _registerUser;
+  @override
+  State<RegisterView> createState() => _RegisterViewState();
+}
 
-  bool _isLoading = false;
-  String? _errorMessage;
+class _RegisterViewState extends State<RegisterView> {
+  final noscreenshot = NoScreenshot.instance;
 
-  RegisterViewModel() {
-    _initializeUseCases();
+  @override
+  void initState() {
+    super.initState();
+    noscreenshot.screenshotOff();
   }
 
-  void _initializeUseCases() {
-    final databaseHelper = DatabaseHelper();
-    final localDatasource = AuthLocalDatasource(databaseHelper);
-    final repository = AuthRepositoryImpl(localDatasource);
-    _registerUser = RegisterUser(repository);
-  }
-
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
-  }
-
-  Future<void> register({
-    required BuildContext context,
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    _setLoading(true);
-    _clearError();
-
-    try {
-      await _registerUser.call(
-        name: name,
-        email: email,
-        password: password,
-      );
-
-      if (context.mounted) {
-        context.go('/login');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registro exitoso. Ahora puedes iniciar sesión.'),
-            backgroundColor: Colors.green,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Crear Cuenta'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/login'),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.person_add_outlined,
+                size: 60,
+                color: AppTheme.vibrantAmber,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Únete a The Movie Database',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: AppTheme.pureWhite,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Esta aplicación utiliza el servicio de TMDB. Por favor, crea una cuenta en su sitio web oficial. Luego, regresa a esta pantalla para iniciar sesión.',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () {
+                },
+                child: const Text('Ir al sitio de TMDB'),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => context.go('/login'),
+                child: Text(
+                  'Ya tengo una cuenta',
+                  style: TextStyle(color: AppTheme.vibrantAmber),
+                ),
+              ),
+            ],
           ),
-        );
-      }
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setError(String error) {
-    _errorMessage = error;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _errorMessage = null;
+        ),
+      ),
+    );
   }
 }

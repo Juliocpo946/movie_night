@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/services/database_helper.dart';
-import '../../data/datasources/auth_local_datasource.dart';
+import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/usecases/login_user.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../../movies/presentation/viewmodel/movies_viewmodel.dart';
 
 class LoginViewModel extends ChangeNotifier {
   late final LoginUser _loginUser;
+  late final AuthRepository _authRepository;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -19,10 +20,10 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void _initializeUseCases() {
-    final databaseHelper = DatabaseHelper();
-    final localDatasource = AuthLocalDatasource(databaseHelper);
-    final repository = AuthRepositoryImpl(localDatasource);
+    final remoteDatasource = AuthRemoteDatasource();
+    final repository = AuthRepositoryImpl(remoteDatasource);
     _loginUser = LoginUser(repository);
+    _authRepository = repository;
   }
 
   bool get isLoading => _isLoading;
@@ -35,20 +36,24 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> login({
     required BuildContext context,
-    required String email,
+    required String username,
     required String password,
   }) async {
     _setLoading(true);
     _clearError();
 
     try {
-      final user = await _loginUser.call(
-        email: email,
+      final sessionId = await _loginUser.call(
+        username: username,
         password: password,
       );
 
+      final user = await _authRepository.getAccountDetails(sessionId);
+
       if (context.mounted) {
-        context.read<MoviesViewModel>().setCurrentUser(user);
+        final moviesViewModel = context.read<MoviesViewModel>();
+        moviesViewModel.setSessionId(sessionId);
+        moviesViewModel.setCurrentUser(user);
         context.go('/movies');
       }
     } catch (e) {

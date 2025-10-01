@@ -1,4 +1,3 @@
-import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
 
 class LoginUser {
@@ -6,20 +5,18 @@ class LoginUser {
 
   LoginUser(this._repository);
 
-  Future<User> call({
-    required String email,
+  Future<String> call({
+    required String username,
     required String password,
   }) async {
-    if (email.trim().isEmpty) {
-      throw Exception('El email es requerido');
+    if (username.trim().isEmpty) {
+      throw Exception('El nombre de usuario es requerido');
     }
-
     if (password.trim().isEmpty) {
       throw Exception('La contraseña es requerida');
     }
-
     return await _repository.login(
-      email: email.trim().toLowerCase(),
+      username: username.trim(),
       password: password,
     );
   }

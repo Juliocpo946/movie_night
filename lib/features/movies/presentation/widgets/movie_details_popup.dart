@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/config/theme.dart';
 import '../../domain/entities/movie.dart';
+import '../viewmodel/movies_viewmodel.dart';
 
 class MovieDetailsPopup extends StatelessWidget {
   final Movie movie;
@@ -23,7 +25,7 @@ class MovieDetailsPopup extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildBackdropImage(context),
-              _buildMovieInfo(),
+              _buildMovieInfo(context),
             ],
           ),
         ),
@@ -32,55 +34,85 @@ class MovieDetailsPopup extends StatelessWidget {
   }
 
   Widget _buildBackdropImage(BuildContext context) {
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16.0),
-            topRight: Radius.circular(16.0),
-          ),
-          child: CachedNetworkImage(
-            imageUrl: movie.fullBackdropUrl,
-            fit: BoxFit.cover,
-            height: 200,
-            placeholder: (context, url) =>
-            const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => Container(
+    return Hero(
+      tag: 'poster-${movie.id}',
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+            child: CachedNetworkImage(
+              imageUrl: movie.fullBackdropUrl,
+              fit: BoxFit.cover,
               height: 200,
-              color: AppTheme.midnightBlue,
-              child: const Icon(Icons.movie_creation_outlined,
-                  color: AppTheme.lightGray, size: 50),
+              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Container(
+                height: 200,
+                color: AppTheme.midnightBlue,
+                child: const Icon(Icons.movie_creation_outlined, color: AppTheme.lightGray, size: 50),
+              ),
             ),
           ),
-        ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: IconButton(
-            icon: const CircleAvatar(
-              backgroundColor: Colors.black54,
-              child: Icon(Icons.close, color: Colors.white),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: IconButton(
+              icon: const CircleAvatar(
+                backgroundColor: Colors.black54,
+                child: Icon(Icons.close, color: Colors.white),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-            onPressed: () => Navigator.of(context).pop(),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildMovieInfo() {
+  Widget _buildMovieInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            movie.title,
-            style: const TextStyle(
-              color: AppTheme.pureWhite,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  movie.title,
+                  style: const TextStyle(
+                    color: AppTheme.pureWhite,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Consumer<MoviesViewModel>(
+                builder: (context, viewModel, child) {
+                  final isFavorite = viewModel.isFavorite(movie);
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: IconButton(
+                      key: ValueKey<bool>(isFavorite),
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : AppTheme.lightGray,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        viewModel.toggleFavoriteStatus(movie);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Row(
@@ -125,8 +157,7 @@ class MovieDetailsPopup extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const Text('/10',
-            style: TextStyle(color: AppTheme.lightGray, fontSize: 14)),
+        const Text('/10', style: TextStyle(color: AppTheme.lightGray, fontSize: 14)),
       ],
     );
   }

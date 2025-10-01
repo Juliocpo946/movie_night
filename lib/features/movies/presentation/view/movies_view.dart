@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
@@ -21,6 +22,9 @@ class _MoviesViewState extends State<MoviesView> {
   void initState() {
     super.initState();
     noscreenshot.screenshotOff();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MoviesViewModel>().fetchFavorites();
+    });
   }
 
   @override
@@ -31,7 +35,7 @@ class _MoviesViewState extends State<MoviesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: RefreshIndicator(
         onRefresh: context.read<MoviesViewModel>().refresh,
         child: CustomScrollView(
@@ -45,11 +49,11 @@ class _MoviesViewState extends State<MoviesView> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       title: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.movie_outlined,
             color: AppTheme.vibrantAmber,
             size: 28,
@@ -59,6 +63,10 @@ class _MoviesViewState extends State<MoviesView> {
         ],
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.favorite_border, color: AppTheme.lightGray),
+          onPressed: () => context.go('/favorites'),
+        ),
         Consumer<MoviesViewModel>(
           builder: (context, moviesViewModel, child) {
             return PopupMenuButton<String>(

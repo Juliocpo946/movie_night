@@ -8,6 +8,17 @@ class MovieRepositoryImpl implements MovieRepository {
   MovieRepositoryImpl(this._remoteDatasource);
 
   @override
+  Future<void> markAsFavorite(int accountId, String sessionId, int movieId, bool isFavorite) async {
+    await _remoteDatasource.markAsFavorite(accountId, sessionId, movieId, isFavorite);
+  }
+
+  @override
+  Future<List<Movie>> getFavorites(int accountId, String sessionId) async {
+    final movieModels = await _remoteDatasource.getFavoriteMovies(accountId, sessionId);
+    return movieModels.map((model) => model.toEntity()).toList();
+  }
+
+  @override
   Future<List<Movie>> getPopularMovies({int page = 1}) async {
     try {
       final movieModels = await _remoteDatasource.getPopularMovies(page: page);
@@ -26,5 +37,4 @@ class MovieRepositoryImpl implements MovieRepository {
       throw Exception('Error al buscar películas: ${e.toString()}');
     }
   }
-
 }

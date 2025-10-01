@@ -4,7 +4,7 @@ import '../../../../core/config/theme.dart';
 import '../../domain/entities/movie.dart';
 import 'movie_details_popup.dart';
 
-class MoviePosterCard extends StatelessWidget {
+class MoviePosterCard extends StatefulWidget {
   final Movie movie;
 
   const MoviePosterCard({
@@ -13,49 +13,83 @@ class MoviePosterCard extends StatelessWidget {
   });
 
   @override
+  State<MoviePosterCard> createState() => _MoviePosterCardState();
+}
+
+class _MoviePosterCardState extends State<MoviePosterCard> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return MovieDetailsPopup(movie: movie);
-          },
-        );
-      },
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 4,
-              child: _buildPosterImage(),
-            ),
-            Expanded(
-              flex: 2,
-              child: _buildMovieInfo(),
-            ),
-          ],
+    return FadeTransition(
+      opacity: _animation,
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return MovieDetailsPopup(movie: widget.movie);
+            },
+          );
+        },
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 4,
+                child: _buildPosterImage(),
+              ),
+              Expanded(
+                flex: 2,
+                child: _buildMovieInfo(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildPosterImage() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppTheme.softCharcoal,
+    return Hero(
+      tag: 'poster-${widget.movie.id}',
+      child: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: AppTheme.softCharcoal,
+        ),
+        child: widget.movie.posterPath.isNotEmpty
+            ? CachedNetworkImage(
+          imageUrl: widget.movie.fullPosterUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => _buildImagePlaceholder(),
+          errorWidget: (context, url, error) => _buildImageError(),
+        )
+            : _buildImageError(),
       ),
-      child: movie.posterPath.isNotEmpty
-          ? CachedNetworkImage(
-        imageUrl: movie.fullPosterUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => _buildImagePlaceholder(),
-        errorWidget: (context, url, error) => _buildImageError(),
-      )
-          : _buildImageError(),
     );
   }
 
@@ -112,7 +146,7 @@ class MoviePosterCard extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              movie.title,
+              widget.movie.title,
               style: const TextStyle(
                 color: AppTheme.pureWhite,
                 fontSize: 12,
@@ -146,7 +180,7 @@ class MoviePosterCard extends StatelessWidget {
         ),
         const SizedBox(width: 2),
         Text(
-          movie.formattedRating,
+          widget.movie.formattedRating,
           style: const TextStyle(
             color: AppTheme.lightGray,
             fontSize: 10,
@@ -158,10 +192,10 @@ class MoviePosterCard extends StatelessWidget {
   }
 
   Widget _buildYearSection() {
-    if (movie.releaseYear == 0) return const SizedBox.shrink();
+    if (widget.movie.releaseYear == 0) return const SizedBox.shrink();
 
     return Text(
-      movie.releaseYear.toString(),
+      widget.movie.releaseYear.toString(),
       style: const TextStyle(
         color: AppTheme.lightGray,
         fontSize: 10,

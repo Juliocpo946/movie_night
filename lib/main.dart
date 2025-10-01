@@ -4,17 +4,13 @@ import 'package:provider/provider.dart';
 
 import 'core/config/router.dart';
 import 'core/config/theme.dart';
-import 'core/services/database_helper.dart';
 import 'features/auth/presentation/viewmodel/login_viewmodel.dart';
-import 'features/auth/presentation/viewmodel/register_viewmodel.dart';
 import 'features/movies/presentation/viewmodel/movies_viewmodel.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-
-  await DatabaseHelper().database;
 
   runApp(const MyApp());
 }
@@ -31,9 +27,6 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => LoginViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => RegisterViewModel(),
         ),
       ],
       child: MaterialApp.router(

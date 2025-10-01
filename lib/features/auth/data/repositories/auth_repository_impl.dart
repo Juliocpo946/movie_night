@@ -1,63 +1,29 @@
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_local_datasource.dart';
-import '../models/user_model.dart';
+import '../datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthLocalDatasource _localDatasource;
+  final AuthRemoteDatasource remoteDatasource;
 
-  AuthRepositoryImpl(this._localDatasource);
+  AuthRepositoryImpl(this.remoteDatasource);
 
   @override
-  Future<void> register({
-    required String name,
-    required String email,
+  Future<String> login({
+    required String username,
     required String password,
   }) async {
-    try {
-      final userModel = UserModel(
-        name: name,
-        email: email,
-        password: password,
-      );
-
-      await _localDatasource.registerUser(userModel);
-    } catch (e) {
-      throw Exception('Error en el registro: ${e.toString()}');
-    }
+    final requestToken = await remoteDatasource.createRequestToken();
+    final validatedToken = await remoteDatasource.validateTokenWithLogin(
+      username,
+      password,
+      requestToken,
+    );
+    final sessionId = await remoteDatasource.createSession(validatedToken);
+    return sessionId;
   }
 
   @override
-  Future<User> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final userModel = await _localDatasource.findUserByEmailAndPassword(
-        email,
-        password,
-      );
-
-      if (userModel == null) {
-        throw Exception('Credenciales incorrectas');
-      }
-
-      return User(
-        id: userModel.id,
-        name: userModel.name,
-        email: userModel.email,
-      );
-    } catch (e) {
-      throw Exception('Error en el login: ${e.toString()}');
-    }
-  }
-
-  @override
-  Future<bool> emailExists(String email) async {
-    try {
-      return await _localDatasource.emailExists(email);
-    } catch (e) {
-      throw Exception('Error al verificar email: ${e.toString()}');
-    }
+  Future<User> getAccountDetails(String sessionId) async {
+    return await remoteDatasource.getAccountDetails(sessionId);
   }
 }
