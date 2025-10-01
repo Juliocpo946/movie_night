@@ -1,4 +1,4 @@
-import '../../domain/entities/movie.dart';
+import '../../../../shared/domain/entities/movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 import '../datasources/remote/movie_remote_datasource.dart';
 
@@ -6,17 +6,6 @@ class MovieRepositoryImpl implements MovieRepository {
   final MovieRemoteDatasource _remoteDatasource;
 
   MovieRepositoryImpl(this._remoteDatasource);
-
-  @override
-  Future<void> markAsFavorite(int accountId, String sessionId, int movieId, bool isFavorite) async {
-    await _remoteDatasource.markAsFavorite(accountId, sessionId, movieId, isFavorite);
-  }
-
-  @override
-  Future<List<Movie>> getFavorites(int accountId, String sessionId) async {
-    final movieModels = await _remoteDatasource.getFavoriteMovies(accountId, sessionId);
-    return movieModels.map((model) => model.toEntity()).toList();
-  }
 
   @override
   Future<List<Movie>> getPopularMovies({int page = 1}) async {
@@ -38,7 +27,6 @@ class MovieRepositoryImpl implements MovieRepository {
     }
   }
 
-  // NUEVAS IMPLEMENTACIONES
   @override
   Future<void> addRating(String sessionId, int movieId, double rating) async {
     await _remoteDatasource.addRating(sessionId, movieId, rating);

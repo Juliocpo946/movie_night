@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/movies_viewmodel.dart';
-import '../widgets/movie_poster_card.dart';
-import '../../../../core/config/theme.dart';
+import '../../../../core/config/app_theme.dart';
+import '../../../../shared/widgets/movie_poster_card.dart';
+import '../providers/favorites_viewmodel.dart';
 
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
@@ -13,9 +13,9 @@ class FavoritesView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mis Películas Favoritas'),
       ),
-      body: Consumer<MoviesViewModel>(
-        builder: (context, moviesViewModel, child) {
-          if (moviesViewModel.favoriteMovies.isEmpty) {
+      body: Consumer<FavoritesViewModel>(
+        builder: (context, favoritesViewModel, child) {
+          if (favoritesViewModel.favoriteMovies.isEmpty) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -47,9 +47,9 @@ class FavoritesView extends StatelessWidget {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),
-            itemCount: moviesViewModel.favoriteMovies.length,
+            itemCount: favoritesViewModel.favoriteMovies.length,
             itemBuilder: (context, index) {
-              final movie = moviesViewModel.favoriteMovies[index];
+              final movie = favoritesViewModel.favoriteMovies[index];
               return MoviePosterCard(movie: movie);
             },
           );

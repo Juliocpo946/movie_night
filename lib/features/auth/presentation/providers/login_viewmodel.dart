@@ -6,7 +6,7 @@ import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../../movies/presentation/viewmodel/movies_viewmodel.dart';
+import '../../../movies/presentation/providers/movies_viewmodel.dart';
 
 class LoginViewModel extends ChangeNotifier {
   late final LoginUser _loginUser;
@@ -42,25 +42,32 @@ class LoginViewModel extends ChangeNotifier {
     _setLoading(true);
     _clearError();
 
-    try {
-      final sessionId = await _loginUser.call(
-        username: username,
-        password: password,
-      );
+    final (sessionId, loginFailure) = await _loginUser.call(
+      username: username,
+      password: password,
+    );
 
-      final user = await _authRepository.getAccountDetails(sessionId);
-
-      if (context.mounted) {
-        final moviesViewModel = context.read<MoviesViewModel>();
-        moviesViewModel.setSessionId(sessionId);
-        moviesViewModel.setCurrentUser(user);
-        context.go('/movies');
-      }
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
+    if (loginFailure != null) {
+      _setError(loginFailure.message);
       _setLoading(false);
+      return;
     }
+
+    final (user, userFailure) = await _authRepository.getAccountDetails(sessionId!);
+
+    if (userFailure != null) {
+      _setError(userFailure.message);
+      _setLoading(false);
+      return;
+    }
+
+    if (context.mounted) {
+      final moviesViewModel = context.read<MoviesViewModel>();
+      moviesViewModel.setSessionId(sessionId);
+      moviesViewModel.setCurrentUser(user!);
+      context.go('/movies');
+    }
+    _setLoading(false);
   }
 
   void _setLoading(bool loading) {
@@ -70,7 +77,6 @@ class LoginViewModel extends ChangeNotifier {
 
   void _setError(String error) {
     _errorMessage = error;
-    notifyListeners();
   }
 
   void _clearError() {

@@ -3,29 +3,24 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
-import '../../domain/entities/movie.dart';
+import '../../../../shared/domain/entities/movie.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
-import '../../domain/usecases/mark_as_favorite.dart';
-import '../../domain/usecases/get_favorites.dart';
-import '../../domain/usecases/add_rating.dart'; // Importar
-import '../../domain/usecases/delete_rating.dart'; // Importar
+import '../../domain/usecases/add_rating.dart';
+import '../../domain/usecases/delete_rating.dart';
 
 class MoviesViewModel extends ChangeNotifier {
   late final GetPopularMovies _getPopularMovies;
   late final SearchMovies _searchMovies;
-  late final MarkAsFavorite _markAsFavorite;
-  late final GetFavorites _getFavorites;
-  late final AddRating _addRating; // Añadir
-  late final DeleteRating _deleteRating; // Añadir
+  late final AddRating _addRating;
+  late final DeleteRating _deleteRating;
 
   User? _currentUser;
   String? _sessionId;
   List<Movie> _popularMovies = [];
   List<Movie> _searchResults = [];
-  List<Movie> _favoriteMovies = [];
-  final Map<int, double> _ratedMovies = {}; // Estado para calificaciones
+  final Map<int, double> _ratedMovies = {};
   bool _isLoading = false;
   bool _isSearching = false;
   String? _errorMessage;
@@ -43,17 +38,14 @@ class MoviesViewModel extends ChangeNotifier {
     final repository = MovieRepositoryImpl(remoteDatasource);
     _getPopularMovies = GetPopularMovies(repository);
     _searchMovies = SearchMovies(repository);
-    _markAsFavorite = MarkAsFavorite(repository);
-    _getFavorites = GetFavorites(repository);
-    _addRating = AddRating(repository); // Inicializar
-    _deleteRating = DeleteRating(repository); // Inicializar
+    _addRating = AddRating(repository);
+    _deleteRating = DeleteRating(repository);
   }
 
   User? get currentUser => _currentUser;
   String? get sessionId => _sessionId;
   List<Movie> get popularMovies => _popularMovies;
   List<Movie> get searchResults => _searchResults;
-  List<Movie> get favoriteMovies => _favoriteMovies;
   Map<int, double> get ratedMovies => _ratedMovies;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
@@ -68,7 +60,7 @@ class MoviesViewModel extends ChangeNotifier {
 
   void setSessionId(String sessionId) {
     _sessionId = sessionId;
-    fetchFavorites();
+    notifyListeners();
   }
 
   void logout(BuildContext context) {
@@ -76,57 +68,12 @@ class MoviesViewModel extends ChangeNotifier {
     _sessionId = null;
     _popularMovies.clear();
     _searchResults.clear();
-    _favoriteMovies.clear();
     _ratedMovies.clear();
     _searchQuery = '';
     notifyListeners();
     context.go('/login');
   }
 
-  bool isFavorite(Movie movie) {
-    return _favoriteMovies.any((fav) => fav.id == movie.id);
-  }
-
-  Future<void> toggleFavoriteStatus(Movie movie) async {
-    if (_sessionId == null || _currentUser?.id == null) return;
-
-    final isCurrentlyFavorite = isFavorite(movie);
-    final originalFavorites = List<Movie>.from(_favoriteMovies);
-
-    if (isCurrentlyFavorite) {
-      _favoriteMovies.removeWhere((fav) => fav.id == movie.id);
-    } else {
-      _favoriteMovies.add(movie);
-    }
-    notifyListeners();
-
-    try {
-      await _markAsFavorite(
-        _currentUser!.id!,
-        _sessionId!,
-        movie.id,
-        !isCurrentlyFavorite,
-      );
-    } catch (e) {
-      _favoriteMovies = originalFavorites;
-      _setError(e.toString());
-      notifyListeners();
-    }
-  }
-
-  Future<void> fetchFavorites() async {
-    if (_sessionId == null || _currentUser?.id == null) return;
-    try {
-      final favorites = await _getFavorites(_currentUser!.id!, _sessionId!);
-      _favoriteMovies = favorites;
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      notifyListeners();
-    }
-  }
-
-  // NUEVOS MÉTODOS PARA CALIFICACIÓN
   Future<void> rateMovie(int movieId, double rating) async {
     if (_sessionId == null) return;
     _ratedMovies[movieId] = rating;
@@ -222,7 +169,6 @@ class MoviesViewModel extends ChangeNotifier {
 
   Future<void> refresh() async {
     await loadPopularMovies();
-    await fetchFavorites();
   }
 
   void _setLoading(bool loading) {

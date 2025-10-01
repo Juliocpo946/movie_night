@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/theme.dart';
-import '../viewmodel/movies_viewmodel.dart';
+import '../../../favorites/presentation/providers/favorites_viewmodel.dart';
+import '../providers/movies_viewmodel.dart';
 import '../widgets/movie_grid.dart';
 import '../widgets/search_bar_widget.dart';
 
@@ -23,7 +24,7 @@ class _MoviesViewState extends State<MoviesView> {
     super.initState();
     noscreenshot.screenshotOff();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MoviesViewModel>().fetchFavorites();
+      context.read<FavoritesViewModel>().fetchFavorites();
     });
   }
 
@@ -37,7 +38,10 @@ class _MoviesViewState extends State<MoviesView> {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: RefreshIndicator(
-        onRefresh: context.read<MoviesViewModel>().refresh,
+        onRefresh: () async {
+          await context.read<MoviesViewModel>().refresh();
+          await context.read<FavoritesViewModel>().fetchFavorites();
+        },
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: _buildSearchSection()),
@@ -65,8 +69,7 @@ class _MoviesViewState extends State<MoviesView> {
       actions: [
         IconButton(
           icon: const Icon(Icons.favorite_border, color: AppTheme.lightGray),
-          // ***** CAMBIO APLICADO AQUÍ *****
-          onPressed: () => context.push('/favorites'), // Cambiado de .go() a .push()
+          onPressed: () => context.push('/favorites'),
         ),
         Consumer<MoviesViewModel>(
           builder: (context, moviesViewModel, child) {
@@ -83,6 +86,7 @@ class _MoviesViewState extends State<MoviesView> {
               ),
               onSelected: (value) {
                 if (value == 'logout') {
+                  context.read<FavoritesViewModel>().clearFavorites();
                   moviesViewModel.logout(context);
                 }
               },

@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/config/theme.dart';
-import '../../domain/entities/movie.dart';
-import '../viewmodel/movies_viewmodel.dart';
+import '../../core/config/app_theme.dart';
+import '../../features/favorites/presentation/providers/favorites_viewmodel.dart';
+import '../../features/movies/presentation/providers/movies_viewmodel.dart';
+import '../domain/entities/movie.dart';
 
 class MovieDetailsPopup extends StatelessWidget {
   final Movie movie;
@@ -90,7 +91,7 @@ class MovieDetailsPopup extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer<MoviesViewModel>(
+              Consumer<FavoritesViewModel>(
                 builder: (context, viewModel, child) {
                   final isFavorite = viewModel.isFavorite(movie);
                   return AnimatedSwitcher(
@@ -206,10 +207,9 @@ class MovieDetailsPopup extends StatelessWidget {
                   children: List.generate(5, (index) {
                     final ratingValue = (index + 1) * 2.0;
                     return IconButton(
-                      // ***** SOLUCIÓN APLICADA AQUÍ *****
-                      iconSize: 28, // Tamaño del ícono reducido
-                      padding: const EdgeInsets.symmetric(horizontal: 2.0), // Padding horizontal reducido
-                      constraints: const BoxConstraints(), // Elimina el tamaño mínimo del botón
+                      iconSize: 28,
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      constraints: const BoxConstraints(),
                       icon: Icon(
                         userRating != null && userRating >= ratingValue
                             ? Icons.star

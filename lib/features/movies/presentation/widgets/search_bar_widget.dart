@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/config/theme.dart';
-import '../viewmodel/movies_viewmodel.dart';
+import '../../../../core/config/app_theme.dart';
+import '../providers/movies_viewmodel.dart';
 
 class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({super.key});

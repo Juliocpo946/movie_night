@@ -1,10 +1,11 @@
+import '../../../../core/error/failures.dart';
 import '../entities/user.dart';
 
 abstract class AuthRepository {
-  Future<String> login({
+  Future<(String?, Failure?)> login({
     required String username,
     required String password,
   });
 
-  Future<User> getAccountDetails(String sessionId);
+  Future<(User?, Failure?)> getAccountDetails(String sessionId);
 }

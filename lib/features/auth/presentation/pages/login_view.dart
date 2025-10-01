@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
-import '../../../../core/config/theme.dart';
-import '../viewmodel/login_viewmodel.dart';
+import '../../../../core/config/app_theme.dart';
+import '../providers/login_viewmodel.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});

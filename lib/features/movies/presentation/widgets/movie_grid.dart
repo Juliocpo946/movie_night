@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../viewmodel/movies_viewmodel.dart';
-import 'movie_poster_card.dart';
+import '../providers/movies_viewmodel.dart';
+import '../../../../shared/widgets/movie_poster_card.dart';
 
 class MovieGrid extends StatelessWidget {
   const MovieGrid({super.key});
@@ -15,7 +15,6 @@ class MovieGrid extends StatelessWidget {
             ? moviesViewModel.searchResults
             : moviesViewModel.popularMovies;
 
-        // Si está cargando por primera vez y no hay películas, muestra un indicador de carga
         if (moviesViewModel.isLoading && movies.isEmpty) {
           return const SliverFillRemaining(
             child: Center(
@@ -31,21 +30,18 @@ class MovieGrid extends StatelessWidget {
           );
         }
 
-        // Si no hay películas y no está cargando, muestra el estado vacío
         if (movies.isEmpty && !moviesViewModel.isLoading) {
           return SliverFillRemaining(
             child: _buildEmptyState(moviesViewModel),
           );
         }
 
-        // Paginación: escucha las notificaciones de scroll
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
             if (!moviesViewModel.isLoading &&
                 moviesViewModel.hasMorePages &&
                 scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
 
-              // Carga más películas solo si no hay una búsqueda activa
               if (moviesViewModel.searchQuery.isEmpty) {
                 context.read<MoviesViewModel>().loadPopularMovies(loadMore: true);
               }
@@ -63,13 +59,11 @@ class MovieGrid extends StatelessWidget {
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  // Si llegamos al final de la lista y hay más páginas, mostramos un loader
                   if (index == movies.length && moviesViewModel.hasMorePages && moviesViewModel.searchQuery.isEmpty) {
                     return const Center(child: CircularProgressIndicator());
                   }
                   return MoviePosterCard(movie: movies[index]);
                 },
-                // Añadimos 1 al count si hay más páginas para mostrar el loader
                 childCount: movies.length + (moviesViewModel.hasMorePages && moviesViewModel.searchQuery.isEmpty ? 1 : 0),
               ),
             ),
@@ -80,7 +74,6 @@ class MovieGrid extends StatelessWidget {
   }
 
   Widget _buildEmptyState(MoviesViewModel moviesViewModel) {
-    // ... (Este método no cambia)
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

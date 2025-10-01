@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import '../../../../core/error/exceptions.dart';
+import '../../../../core/network/http_client.dart';
+import '../../../../core/utils/constants.dart';
 import '../../domain/entities/user.dart';
 
 class AuthRemoteDatasource {
@@ -8,9 +11,9 @@ class AuthRemoteDatasource {
   final String _baseUrl;
   final String _apiKey;
 
-  AuthRemoteDatasource({http.Client? client})
-      : _client = client ?? http.Client(),
-        _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3',
+  AuthRemoteDatasource()
+      : _client = HttpClient().client,
+        _baseUrl = AppConstants.tmdbBaseUrl,
         _apiKey = dotenv.env['TMDB_API_KEY'] ?? '';
 
   Future<String> createRequestToken() async {
@@ -21,7 +24,7 @@ class AuthRemoteDatasource {
       final data = json.decode(response.body);
       return data['request_token'] as String;
     } else {
-      throw Exception('Error al crear el token de solicitud');
+      throw ServerException(message: 'Error al crear el token de solicitud');
     }
   }
 
@@ -41,7 +44,7 @@ class AuthRemoteDatasource {
       final data = json.decode(response.body);
       return data['request_token'] as String;
     } else {
-      throw Exception('Nombre de usuario o contraseña inválidos');
+      throw ServerException(message: 'Nombre de usuario o contraseña inválidos');
     }
   }
 
@@ -57,7 +60,7 @@ class AuthRemoteDatasource {
       final data = json.decode(response.body);
       return data['session_id'] as String;
     } else {
-      throw Exception('Error al crear la sesión');
+      throw ServerException(message: 'Error al crear la sesión');
     }
   }
 
@@ -76,7 +79,7 @@ class AuthRemoteDatasource {
         email: 'No disponible',
       );
     } else {
-      throw Exception('Error al obtener los detalles de la cuenta');
+      throw ServerException(message: 'Error al obtener los detalles de la cuenta');
     }
   }
 }

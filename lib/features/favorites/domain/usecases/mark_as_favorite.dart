@@ -1,7 +1,7 @@
-import '../repositories/movie_repository.dart';
+import '../repositories/favorites_repository.dart';
 
 class MarkAsFavorite {
-  final MovieRepository repository;
+  final FavoritesRepository repository;
 
   MarkAsFavorite(this.repository);
 

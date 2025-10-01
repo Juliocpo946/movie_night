@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-
+import '../../../../../core/error/exceptions.dart';
+import '../../../../../core/network/http_client.dart';
+import '../../../../../core/utils/constants.dart';
 import '../../models/movie_model.dart';
 
 class MovieRemoteDatasource {
@@ -9,60 +11,10 @@ class MovieRemoteDatasource {
   final String _baseUrl;
   final String _apiKey;
 
-  MovieRemoteDatasource({
-    http.Client? client,
-  })  : _client = client ?? http.Client(),
-        _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3',
+  MovieRemoteDatasource()
+      : _client = HttpClient().client,
+        _baseUrl = AppConstants.tmdbBaseUrl,
         _apiKey = dotenv.env['TMDB_API_KEY'] ?? '';
-
-  Future<void> markAsFavorite(int accountId, String sessionId, int movieId, bool isFavorite) async {
-    final url = Uri.parse('$_baseUrl/account/$accountId/favorite').replace(queryParameters: {
-      'api_key': _apiKey,
-      'session_id': sessionId,
-    });
-
-    final response = await _client.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-      body: json.encode({
-        'media_type': 'movie',
-        'media_id': movieId,
-        'favorite': isFavorite,
-      }),
-    );
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Error al marcar como favorito: ${response.body}');
-    }
-  }
-
-  Future<List<MovieModel>> getFavoriteMovies(int accountId, String sessionId) async {
-    final url = Uri.parse('$_baseUrl/account/$accountId/favorite/movies').replace(queryParameters: {
-      'api_key': _apiKey,
-      'session_id': sessionId,
-      'language': 'es-ES',
-      'sort_by': 'created_at.asc',
-    });
-
-    final response = await _client.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> results = data['results'] as List<dynamic>;
-
-      return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).toList();
-    } else {
-      throw Exception('Error al obtener películas favoritas: ${response.body}');
-    }
-  }
 
   Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
     try {
@@ -86,11 +38,10 @@ class MovieRemoteDatasource {
 
         return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
       } else {
-        throw Exception('Error ${response.statusCode}: ${response.reasonPhrase}');
+        throw ServerException(message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
       }
     } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception('Error de conexión: ${e.toString()}');
+      throw ServerException(message: 'Error de conexión: ${e.toString()}');
     }
   }
 
@@ -122,15 +73,13 @@ class MovieRemoteDatasource {
 
         return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
       } else {
-        throw Exception('Error ${response.statusCode}: ${response.reasonPhrase}');
+        throw ServerException(message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
       }
     } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception('Error de búsqueda: ${e.toString()}');
+      throw ServerException(message: 'Error de búsqueda: ${e.toString()}');
     }
   }
 
-  // NUEVOS MÉTODOS
   Future<void> addRating(String sessionId, int movieId, double rating) async {
     final url = Uri.parse('$_baseUrl/movie/$movieId/rating').replace(queryParameters: {
       'api_key': _apiKey,
@@ -144,7 +93,7 @@ class MovieRemoteDatasource {
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Error al añadir la calificación: ${response.body}');
+      throw ServerException(message: 'Error al añadir la calificación: ${response.body}');
     }
   }
 
@@ -160,7 +109,7 @@ class MovieRemoteDatasource {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Error al eliminar la calificación: ${response.body}');
+      throw ServerException(message: 'Error al eliminar la calificación: ${response.body}');
     }
   }
 

@@ -1,8 +1,8 @@
-import '../entities/movie.dart';
-import '../repositories/movie_repository.dart';
+import '../../../../shared/domain/entities/movie.dart';
+import '../repositories/favorites_repository.dart';
 
 class GetFavorites {
-  final MovieRepository repository;
+  final FavoritesRepository repository;
 
   GetFavorites(this.repository);
 
