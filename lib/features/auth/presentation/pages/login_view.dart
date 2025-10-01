@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../../core/config/app_theme.dart';
 import '../providers/login_viewmodel.dart';
@@ -14,7 +13,6 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final noscreenshot = NoScreenshot.instance;
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -23,7 +21,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    noscreenshot.screenshotOn();
   }
 
   @override

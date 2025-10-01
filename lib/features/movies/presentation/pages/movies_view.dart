@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:no_screenshot/no_screenshot.dart';
-
 import '../../../../core/config/app_theme.dart';
 import '../../../favorites/presentation/providers/favorites_viewmodel.dart';
 import '../providers/movies_viewmodel.dart';
@@ -17,12 +15,10 @@ class MoviesView extends StatefulWidget {
 }
 
 class _MoviesViewState extends State<MoviesView> {
-  final noscreenshot = NoScreenshot.instance;
 
   @override
   void initState() {
     super.initState();
-    noscreenshot.screenshotOff();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<FavoritesViewModel>().fetchFavorites();
     });
