@@ -16,6 +16,6 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   @override
   Future<List<Movie>> getFavorites(int accountId, String sessionId) async {
     final movieModels = await remoteDatasource.getFavoriteMovies(accountId, sessionId);
-    return movieModels.map((model) => model.toEntity()).toList();
+    return movieModels.where((model) => model != null).map((model) => model!.toEntity()).toList();
   }
 }

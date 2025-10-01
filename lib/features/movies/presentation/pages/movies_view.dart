@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
-import '../../../../core/config/theme.dart';
+import '../../../../core/config/app_theme.dart';
 import '../../../favorites/presentation/providers/favorites_viewmodel.dart';
 import '../providers/movies_viewmodel.dart';
 import '../widgets/movie_grid.dart';
