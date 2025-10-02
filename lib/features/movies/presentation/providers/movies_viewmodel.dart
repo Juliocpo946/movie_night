@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
 import '../../../../shared/domain/entities/movie.dart';
-import '../../../auth/domain/entities/user.dart';
+import '../../../auth/domain/entities/auth_user.dart';
 import '../../domain/entities/rated_movie.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';

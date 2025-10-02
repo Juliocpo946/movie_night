@@ -1,9 +1,9 @@
-class User {
+class AuthUser{
   final int? id;
   final String name;
   final String email;
 
-  const User({
+  const AuthUser({
     this.id,
     required this.name,
     required this.email,
@@ -12,7 +12,7 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is User &&
+          other is AuthUser &&
               runtimeType == other.runtimeType &&
               id == other.id &&
               name == other.name &&

@@ -1,13 +1,13 @@
 import '../../../../core/error/failures.dart';
-import '../entities/user.dart';
-import '../repositories/auth_repository.dart';
+import '../entities/registered_user.dart';
+import '../repositories/register_repository.dart';
 
 class RegisterUser {
-  final AuthRepository _repository;
+  final RegisterRepository _repository;
 
   RegisterUser(this._repository);
 
-  Future<(User?, Failure?)> call({
+  Future<(RegisteredUser?, Failure?)> call({
     required String username,
     required String email,
     required String password,

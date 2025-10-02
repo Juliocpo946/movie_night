@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/entities/auth_user.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../../movies/presentation/providers/movies_viewmodel.dart';
+import '../../domain/entities/auth_user.dart' as AuthDomain;
 
 class LoginViewModel extends ChangeNotifier {
   late final LoginUser _loginUser;
@@ -39,7 +41,7 @@ class LoginViewModel extends ChangeNotifier {
     _setLoading(true);
     _clearError();
 
-    final (authResponse, loginFailure) = await _loginUser.call(
+    final (loginResponse, loginFailure) = await _loginUser.call(
       username: username,
       password: password,
     );
@@ -51,11 +53,19 @@ class LoginViewModel extends ChangeNotifier {
       return;
     }
 
-    if (authResponse != null) {
-      final user = authResponse.toEntity();
+    if (loginResponse != null) {
+      if (!context.mounted) return;
+
       final moviesViewModel = context.read<MoviesViewModel>();
-      moviesViewModel.setSessionId(authResponse.accessToken);
-      moviesViewModel.setCurrentUser(user);
+      moviesViewModel.setSessionId(loginResponse.accessToken);
+
+      final sharedUser = AuthDomain.User(
+        id: loginResponse.user.id,
+        name: loginResponse.user.name,
+        email: '',
+      );
+
+      moviesViewModel.setCurrentUser(sharedUser);
       context.go('/movies');
     }
   }

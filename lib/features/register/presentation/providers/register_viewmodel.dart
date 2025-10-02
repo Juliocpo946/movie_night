@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/datasources/auth_remote_datasource.dart';
-import '../../data/repositories/auth_repository_impl.dart';
+import '../../../auth/data/datasources/auth_remote_datasource.dart';
+import '../../data/repositories/register_repository_impl.dart';
 import '../../domain/usecases/register_user.dart';
 
 class RegisterViewModel extends ChangeNotifier {
@@ -12,7 +12,7 @@ class RegisterViewModel extends ChangeNotifier {
 
   RegisterViewModel() {
     final remoteDatasource = AuthRemoteDatasource();
-    final repository = AuthRepositoryImpl(remoteDatasource);
+    final repository = RegisterRepositoryImpl(remoteDatasource);
     _registerUser = RegisterUser(repository);
   }
 
@@ -44,6 +44,7 @@ class RegisterViewModel extends ChangeNotifier {
     if (failure != null) {
       _setError(failure.message);
     } else if (user != null) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario creado con éxito')),
       );

@@ -1,4 +1,5 @@
-import '../../domain/entities/user.dart';
+import '../../domain/entities/auth_user.dart';
+import '../../domain/entities/login_response.dart';
 
 class AuthResponseModel {
   final String accessToken;
@@ -19,11 +20,13 @@ class AuthResponseModel {
     );
   }
 
-  User toEntity() {
-    return User(
-      id: userId,
-      name: username,
-      email: '',
+  LoginResponse toEntity() {
+    return LoginResponse(
+      accessToken: accessToken,
+      user: AuthUser(
+        id: userId,
+        name: username,
+      ),
     );
   }
 }

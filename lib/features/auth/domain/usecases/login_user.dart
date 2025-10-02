@@ -1,5 +1,5 @@
 import '../../../../core/error/failures.dart';
-import '../../data/models/auth_response_model.dart';
+import '../entities/login_response.dart';
 import '../repositories/auth_repository.dart';
 
 class LoginUser {
@@ -7,7 +7,7 @@ class LoginUser {
 
   LoginUser(this._repository);
 
-  Future<(AuthResponseModel?, Failure?)> call({
+  Future<(LoginResponse?, Failure?)> call({
     required String username,
     required String password,
   }) async {

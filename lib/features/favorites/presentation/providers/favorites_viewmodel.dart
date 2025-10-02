@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../shared/domain/entities/movie.dart';
-import '../../../auth/domain/entities/user.dart';
+import '../../../auth/domain/entities/auth_user.dart';
 import '../../data/datasources/favorites_remote_datasource.dart';
 import '../../data/repositories/favorites_repository_impl.dart';
 import '../../domain/usecases/get_favorites.dart';
