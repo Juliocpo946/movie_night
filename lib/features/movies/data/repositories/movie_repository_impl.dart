@@ -1,4 +1,4 @@
-import '../../../../shared/domain/entities/movie.dart';
+import '../../domain/entities/movie.dart';
 import '../../domain/entities/rated_movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 import '../datasources/remote/movie_remote_datasource.dart';

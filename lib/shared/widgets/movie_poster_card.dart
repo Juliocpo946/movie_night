@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../core/config/app_theme.dart';
-import '../domain/entities/movie.dart';
+import '../../features/movies/domain/entities/movie.dart';
 import 'movie_details_popup.dart';
 
 class MoviePosterCard extends StatefulWidget {

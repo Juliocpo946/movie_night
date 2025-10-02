@@ -23,7 +23,7 @@ class AuthResponseModel {
   LoginResponse toEntity() {
     return LoginResponse(
       accessToken: accessToken,
-      user: AuthUser(
+      user: AuthUser( // <- Corregido
         id: userId,
         name: username,
       ),

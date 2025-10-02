@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/http_client.dart';
 import '../../../../core/utils/constants.dart';
-import '../../../auth/data/models/user_model.dart';
-import '../models/register_request_model.dart';
+import '../../data/models/user_model.dart';
 
 class RegisterRemoteDatasource {
   final http.Client _client;
@@ -14,12 +13,16 @@ class RegisterRemoteDatasource {
       : _client = HttpClient().client,
         _baseUrl = AppConstants.tmdbBaseUrl;
 
-  Future<UserModel> register(RegisterRequestModel request) async {
+  Future<UserModel> register(String username, String email, String password) async {
     final url = Uri.parse('$_baseUrl/users/register');
     final response = await _client.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(request.toJson()),
+      body: json.encode({
+        'username': username,
+        'email': email,
+        'password': password,
+      }),
     );
 
     if (response.statusCode == 200) {

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import '../../../../shared/domain/entities/user.dart';
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
-import '../../../../shared/domain/entities/movie.dart';
-import '../../../auth/domain/entities/auth_user.dart';
+import '../../domain/entities/movie.dart';
 import '../../domain/entities/rated_movie.dart';
-import '../../domain/usecases/get_popular_movies.dart';
-import '../../domain/usecases/search_movies.dart';
 import '../../domain/usecases/add_rating.dart';
 import '../../domain/usecases/delete_rating.dart';
+import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/get_rated_movies.dart';
+import '../../domain/usecases/search_movies.dart';
 
 class MoviesViewModel extends ChangeNotifier {
   late final GetPopularMovies _getPopularMovies;
@@ -83,7 +82,7 @@ class MoviesViewModel extends ChangeNotifier {
     if (_sessionId == null || _currentUser?.id == null) return;
     try {
       final List<RatedMovie> ratedMoviesList =
-      await _getRatedMovies(_sessionId!, _currentUser!.id!);
+      await _getRatedMovies(_sessionId!, _currentUser!.id);
       _ratedMovies.clear();
       for (var ratedMovie in ratedMoviesList) {
         _ratedMovies[ratedMovie.movieId] = ratedMovie.rating;
@@ -99,7 +98,7 @@ class MoviesViewModel extends ChangeNotifier {
     _ratedMovies[movieId] = rating;
     notifyListeners();
     try {
-      await _addRating(_sessionId!, _currentUser!.id!, movieId, rating);
+      await _addRating(_sessionId!, _currentUser!.id, movieId, rating);
     } catch (e) {
       _ratedMovies.remove(movieId);
       _setError(e.toString());
@@ -113,7 +112,7 @@ class MoviesViewModel extends ChangeNotifier {
     _ratedMovies.remove(movieId);
     notifyListeners();
     try {
-      await _deleteRating(_sessionId!, _currentUser!.id!, movieId);
+      await _deleteRating(_sessionId!, _currentUser!.id, movieId);
     } catch (e) {
       if (originalRating != null) {
         _ratedMovies[movieId] = originalRating;

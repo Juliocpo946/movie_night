@@ -1,11 +1,11 @@
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
-import '../../../auth/data/datasources/auth_remote_datasource.dart';
 import '../../domain/entities/registered_user.dart';
 import '../../domain/repositories/register_repository.dart';
+import '../datasources/register_remote_datasource.dart';
 
 class RegisterRepositoryImpl implements RegisterRepository {
-  final AuthRemoteDatasource remoteDatasource;
+  final RegisterRemoteDatasource remoteDatasource;
 
   RegisterRepositoryImpl(this.remoteDatasource);
 
@@ -17,12 +17,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
   }) async {
     try {
       final userModel = await remoteDatasource.register(username, email, password);
-      final registeredUser = RegisteredUser(
-        id: userModel.id,
-        name: userModel.name,
-        email: userModel.email,
-      );
-      return (registeredUser, null);
+      return (userModel, null);
     } on ServerException catch (e) {
       return (null, ServerFailure(message: e.message));
     }

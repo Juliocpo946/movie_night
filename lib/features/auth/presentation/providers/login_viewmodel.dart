@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
+import '../../../../shared/domain/entities/user.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
-import '../../domain/entities/auth_user.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../../movies/presentation/providers/movies_viewmodel.dart';
-import '../../domain/entities/auth_user.dart' as AuthDomain;
 
 class LoginViewModel extends ChangeNotifier {
   late final LoginUser _loginUser;
@@ -59,7 +57,7 @@ class LoginViewModel extends ChangeNotifier {
       final moviesViewModel = context.read<MoviesViewModel>();
       moviesViewModel.setSessionId(loginResponse.accessToken);
 
-      final sharedUser = AuthDomain.User(
+      final sharedUser = User(
         id: loginResponse.user.id,
         name: loginResponse.user.name,
         email: '',

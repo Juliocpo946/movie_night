@@ -20,8 +20,9 @@ class _MoviesViewState extends State<MoviesView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Se obtienen los favoritos al iniciar la pantalla
-      context.read<FavoritesViewModel>().fetchFavorites();
+      if (mounted) {
+        context.read<FavoritesViewModel>().fetchFavorites();
+      }
     });
   }
 
@@ -38,6 +39,7 @@ class _MoviesViewState extends State<MoviesView> {
         onRefresh: () async {
           await context.read<MoviesViewModel>().refresh();
           await context.read<FavoritesViewModel>().fetchFavorites();
+
         },
         child: const CustomScrollView(
           slivers: [
@@ -99,7 +101,6 @@ class _MoviesViewState extends State<MoviesView> {
                     ),
                   ),
                 ),
-                // --- FIN DE LA CORRECCIÓN ---
                 const PopupMenuDivider(),
                 const PopupMenuItem(
                   value: 'logout',
@@ -120,7 +121,6 @@ class _MoviesViewState extends State<MoviesView> {
   }
 }
 
-// Se ha movido la lógica del mensaje de error a su propio widget para mejorar la legibilidad.
 class _ErrorMessage extends StatelessWidget {
   const _ErrorMessage();
 

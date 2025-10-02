@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../auth/data/datasources/auth_remote_datasource.dart';
+import '../../data/datasources/register_remote_datasource.dart';
 import '../../data/repositories/register_repository_impl.dart';
 import '../../domain/usecases/register_user.dart';
 
@@ -11,7 +11,7 @@ class RegisterViewModel extends ChangeNotifier {
   String? _errorMessage;
 
   RegisterViewModel() {
-    final remoteDatasource = AuthRemoteDatasource();
+    final remoteDatasource = RegisterRemoteDatasource();
     final repository = RegisterRepositoryImpl(remoteDatasource);
     _registerUser = RegisterUser(repository);
   }

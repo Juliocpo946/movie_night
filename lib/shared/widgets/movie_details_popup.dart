@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/config/app_theme.dart';
 import '../../features/favorites/presentation/providers/favorites_viewmodel.dart';
+import '../../features/movies/domain/entities/movie.dart';
 import '../../features/movies/presentation/providers/movies_viewmodel.dart';
-import '../domain/entities/movie.dart';
 
 class MovieDetailsPopup extends StatelessWidget {
   final Movie movie;
@@ -93,7 +93,7 @@ class MovieDetailsPopup extends StatelessWidget {
               ),
               Consumer<FavoritesViewModel>(
                 builder: (context, viewModel, child) {
-                  final isFavorite = viewModel.isFavorite(movie);
+                  final isFavorite = viewModel.isFavorite(movie.id);
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 100),
                     transitionBuilder: (child, animation) {
@@ -107,7 +107,7 @@ class MovieDetailsPopup extends StatelessWidget {
                         size: 30,
                       ),
                       onPressed: () {
-                        viewModel.toggleFavoriteStatus(movie);
+                        viewModel.toggleFavoriteStatus(movie.id, movie.title, movie.posterPath);
                       },
                     ),
                   );

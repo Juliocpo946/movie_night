@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import '../../../../core/error/failures.dart';
-import '../../../../shared/domain/entities/movie.dart';
-import '../../../auth/domain/entities/auth_user.dart';
+import '../../../../shared/domain/entities/user.dart';
 import '../../data/datasources/favorites_remote_datasource.dart';
 import '../../data/repositories/favorites_repository_impl.dart';
-import '../../domain/usecases/get_favorites.dart';
-import '../../domain/usecases/mark_as_favorite.dart';
+import '../../domain/entities/favorite_movie.dart';
+import '../../domain/usecases/get_favorites_usecase.dart';
+import '../../domain/usecases/mark_as_favorite_usecase.dart';
 
 class FavoritesViewModel extends ChangeNotifier {
-  late final MarkAsFavorite _markAsFavorite;
-  late final GetFavorites _getFavorites;
+  late final MarkAsFavoriteUseCase _markAsFavorite;
+  late final GetFavoritesUseCase _getFavorites;
 
   User? _currentUser;
   String? _sessionId;
-  List<Movie> _favoriteMovies = [];
+  List<FavoriteMovie> _favoriteMovies = [];
   Failure? _failure;
 
   FavoritesViewModel() {
     final remoteDatasource = FavoritesRemoteDatasource();
     final repository = FavoritesRepositoryImpl(remoteDatasource);
-    _markAsFavorite = MarkAsFavorite(repository);
-    _getFavorites = GetFavorites(repository);
+    _markAsFavorite = MarkAsFavoriteUseCase(repository);
+    _getFavorites = GetFavoritesUseCase(repository);
   }
 
-  List<Movie> get favoriteMovies => _favoriteMovies;
+  List<FavoriteMovie> get favoriteMovies => _favoriteMovies;
   Failure? get failure => _failure;
 
   void updateCredentials({User? user, String? sessionId}) {
@@ -47,26 +47,26 @@ class FavoritesViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isFavorite(Movie movie) {
-    return _favoriteMovies.any((fav) => fav.id == movie.id);
+  bool isFavorite(int movieId) {
+    return _favoriteMovies.any((fav) => fav.id == movieId);
   }
 
-  Future<void> toggleFavoriteStatus(Movie movie) async {
+  Future<void> toggleFavoriteStatus(int movieId, String title, String posterPath) async {
     if (_sessionId == null || _currentUser?.id == null) return;
 
-    final isCurrentlyFavorite = isFavorite(movie);
-    final originalFavorites = List<Movie>.from(_favoriteMovies);
+    final isCurrentlyFavorite = isFavorite(movieId);
+    final originalFavorites = List<FavoriteMovie>.from(_favoriteMovies);
 
     if (isCurrentlyFavorite) {
-      _favoriteMovies.removeWhere((fav) => fav.id == movie.id);
+      _favoriteMovies.removeWhere((fav) => fav.id == movieId);
     } else {
-      _favoriteMovies.add(movie);
+      _favoriteMovies.add(FavoriteMovie(id: movieId, title: title, posterPath: posterPath));
     }
     notifyListeners();
 
     try {
       await _markAsFavorite(
-          _sessionId!, _currentUser!.id!, movie.id, !isCurrentlyFavorite);
+          _sessionId!, _currentUser!.id, movieId, !isCurrentlyFavorite);
     } catch (e) {
       _favoriteMovies = originalFavorites;
       _failure = ServerFailure(message: e.toString());
@@ -77,7 +77,7 @@ class FavoritesViewModel extends ChangeNotifier {
   Future<void> fetchFavorites() async {
     if (_sessionId == null || _currentUser?.id == null) return;
     try {
-      final favorites = await _getFavorites(_sessionId!, _currentUser!.id!);
+      final favorites = await _getFavorites(_sessionId!, _currentUser!.id);
       _favoriteMovies = favorites;
       _failure = null;
     } catch (e) {

@@ -2,9 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import '../../../../core/config/app_theme.dart';
-import '../../../../shared/domain/entities/movie.dart';
+import '../../domain/entities/movie.dart';
 import '../../../../shared/widgets/movie_details_popup.dart';
 import '../providers/movies_viewmodel.dart';
 

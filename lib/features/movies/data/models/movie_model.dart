@@ -1,4 +1,4 @@
-import '../../../../shared/domain/entities/movie.dart';
+import '../../domain/entities/movie.dart';
 
 class MovieModel extends Movie {
   const MovieModel({
@@ -16,7 +16,7 @@ class MovieModel extends Movie {
     required super.originalTitle,
     required super.popularity,
     required super.video,
-    required super.rating,
+    super.rating,
   });
 
   factory MovieModel.fromJson(Map<String, dynamic> json) {
@@ -40,25 +40,6 @@ class MovieModel extends Movie {
       video: json['video'] as bool? ?? false,
       rating: (json['rating'] as num?)?.toDouble(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'overview': overview,
-      'poster_path': posterPath,
-      'backdrop_path': backdropPath,
-      'release_date': releaseDate,
-      'vote_average': voteAverage,
-      'vote_count': voteCount,
-      'genre_ids': genreIds,
-      'adult': adult,
-      'original_language': originalLanguage,
-      'original_title': originalTitle,
-      'popularity': popularity,
-      'video': video,
-    };
   }
 
   Movie toEntity() {

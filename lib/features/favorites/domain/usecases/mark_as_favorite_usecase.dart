@@ -1,9 +1,9 @@
 import '../repositories/favorites_repository.dart';
 
-class MarkAsFavorite {
+class MarkAsFavoriteUseCase {
   final FavoritesRepository repository;
 
-  MarkAsFavorite(this.repository);
+  MarkAsFavoriteUseCase(this.repository);
 
   Future<void> call(String token, int userId, int movieId, bool isFavorite) async {
     await repository.markAsFavorite(token, userId, movieId, isFavorite);

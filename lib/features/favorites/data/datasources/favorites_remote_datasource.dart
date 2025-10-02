@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/http_client.dart';
 import '../../../../core/utils/constants.dart';
-import '../../../movies/data/models/movie_model.dart';
+import '../models/favorite_movie_model.dart';
 
 class FavoritesRemoteDatasource {
   final http.Client _client;
@@ -46,7 +46,7 @@ class FavoritesRemoteDatasource {
     }
   }
 
-  Future<List<MovieModel>> getFavoriteMovies(String token, int userId) async {
+  Future<List<FavoriteMovieModel>> getFavoriteMovies(String token, int userId) async {
     final url = Uri.parse('$_baseUrl/users/$userId/favorites');
 
     final response = await _client.get(
@@ -62,7 +62,7 @@ class FavoritesRemoteDatasource {
       final List<dynamic> results = json.decode(response.body);
       return results
           .map((movieJson) =>
-          MovieModel.fromJson(movieJson as Map<String, dynamic>))
+          FavoriteMovieModel.fromJson(movieJson as Map<String, dynamic>))
           .toList();
     } else {
       throw ServerException(

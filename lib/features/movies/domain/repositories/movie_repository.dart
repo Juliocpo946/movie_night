@@ -1,4 +1,4 @@
-import '../../../../shared/domain/entities/movie.dart';
+import '../entities/movie.dart';
 import '../entities/rated_movie.dart';
 
 abstract class MovieRepository {
