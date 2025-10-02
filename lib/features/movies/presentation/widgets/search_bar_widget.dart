@@ -47,7 +47,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             color: AppTheme.softCharcoal,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppTheme.lightGray.withOpacity(0.3),
+              color: const Color.fromRGBO(139, 148, 158, 0.3),
               width: 1,
             ),
           ),

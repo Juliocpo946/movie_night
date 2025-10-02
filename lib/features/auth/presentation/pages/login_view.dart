@@ -162,9 +162,9 @@ class _LoginViewState extends State<LoginView> {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              color: const Color.fromRGBO(255, 0, 0, 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.withOpacity(0.3)),
+              border: Border.all(color: const Color.fromRGBO(255, 0, 0, 0.3)),
             ),
             child: Row(
               children: [
