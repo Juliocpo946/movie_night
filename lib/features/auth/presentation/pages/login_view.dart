@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/config/app_theme.dart';
@@ -51,8 +50,6 @@ class _LoginViewState extends State<LoginView> {
                 _buildLoginButton(),
                 const SizedBox(height: 16),
                 _buildErrorMessage(),
-                const SizedBox(height: 24),
-                _buildRegisterLink(),
               ],
             ),
           ),
@@ -178,25 +175,6 @@ class _LoginViewState extends State<LoginView> {
         }
         return const SizedBox.shrink();
       },
-    );
-  }
-
-  Widget _buildRegisterLink() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          '¿No tienes cuenta? ',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        TextButton(
-          onPressed: () => context.go('/register'),
-          child: Text(
-            'Regístrate en TMDB',
-            style: TextStyle(color: AppTheme.vibrantAmber),
-          ),
-        ),
-      ],
     );
   }
 
