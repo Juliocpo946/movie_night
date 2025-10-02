@@ -1,4 +1,6 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
-  static const String tmdbBaseUrl = 'https://api.themoviedb.org/3';
+  static final String tmdbBaseUrl = dotenv.env['API_BASE_URL'] ?? '';
   static const String imageBaseUrl = 'https://image.tmdb.org/t/p/';
 }

@@ -1,28 +1,22 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../../../../../core/error/exceptions.dart';
 import '../../../../../core/network/http_client.dart';
 import '../../../../../core/utils/constants.dart';
 import '../../models/movie_model.dart';
+import '../../models/rated_movie_model.dart';
 
 class MovieRemoteDatasource {
   final http.Client _client;
   final String _baseUrl;
-  final String _apiKey;
 
   MovieRemoteDatasource()
       : _client = HttpClient().client,
-        _baseUrl = AppConstants.tmdbBaseUrl,
-        _apiKey = dotenv.env['TMDB_API_KEY'] ?? '';
+        _baseUrl = AppConstants.tmdbBaseUrl;
 
   Future<List<MovieModel>> getPopularMovies({int page = 1}) async {
     try {
-      final url = Uri.parse('$_baseUrl/movie/popular').replace(queryParameters: {
-        'api_key': _apiKey,
-        'page': page.toString(),
-        'language': 'es-ES',
-      });
+      final url = Uri.parse('$_baseUrl/movies/popular?page=$page');
 
       final response = await _client.get(
         url,
@@ -33,12 +27,16 @@ class MovieRemoteDatasource {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> results = data['results'] as List<dynamic>;
+        final List<dynamic> results = json.decode(response.body);
 
-        return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
+        return results
+            .map((movieJson) =>
+            MovieModel.fromJson(movieJson as Map<String, dynamic>))
+            .where((movie) => movie.posterPath.isNotEmpty)
+            .toList();
       } else {
-        throw ServerException(message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
+        throw ServerException(
+            message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
       }
     } catch (e) {
       throw ServerException(message: 'Error de conexión: ${e.toString()}');
@@ -51,12 +49,10 @@ class MovieRemoteDatasource {
     }
 
     try {
-      final url = Uri.parse('$_baseUrl/search/movie').replace(queryParameters: {
-        'api_key': _apiKey,
+      final url =
+      Uri.parse('$_baseUrl/movies/search').replace(queryParameters: {
         'query': query.trim(),
         'page': page.toString(),
-        'language': 'es-ES',
-        'include_adult': 'false',
       });
 
       final response = await _client.get(
@@ -68,70 +64,77 @@ class MovieRemoteDatasource {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> results = data['results'] as List<dynamic>;
+        final List<dynamic> results = json.decode(response.body);
 
-        return results.map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>)).where((movie) => movie.posterPath.isNotEmpty).toList();
+        return results
+            .map((movieJson) =>
+            MovieModel.fromJson(movieJson as Map<String, dynamic>))
+            .where((movie) => movie.posterPath.isNotEmpty)
+            .toList();
       } else {
-        throw ServerException(message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
+        throw ServerException(
+            message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
       }
     } catch (e) {
       throw ServerException(message: 'Error de búsqueda: ${e.toString()}');
     }
   }
 
-  Future<void> addRating(String sessionId, int movieId, double rating) async {
-    final url = Uri.parse('$_baseUrl/movie/$movieId/rating').replace(queryParameters: {
-      'api_key': _apiKey,
-      'session_id': sessionId,
-    });
+  Future<void> addRating(
+      String token, int userId, int movieId, double rating) async {
+    final url = Uri.parse('$_baseUrl/users/$userId/ratings');
 
     final response = await _client.post(
       url,
-      headers: {'Content-Type': 'application/json;charset=utf-8'},
-      body: json.encode({'value': rating}),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'movie_id': movieId, 'score': rating}),
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ServerException(message: 'Error al añadir la calificación: ${response.body}');
+      throw ServerException(
+          message: 'Error al añadir la calificación: ${response.body}');
     }
   }
 
-  Future<void> deleteRating(String sessionId, int movieId) async {
-    final url = Uri.parse('$_baseUrl/movie/$movieId/rating').replace(queryParameters: {
-      'api_key': _apiKey,
-      'session_id': sessionId,
-    });
+  Future<void> deleteRating(String token, int userId, int movieId) async {
+    final url = Uri.parse('$_baseUrl/users/$userId/ratings/$movieId');
 
     final response = await _client.delete(
       url,
-      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': 'Bearer $token',
+      },
     );
 
-    if (response.statusCode != 200) {
-      throw ServerException(message: 'Error al eliminar la calificación: ${response.body}');
+    if (response.statusCode != 204) {
+      throw ServerException(
+          message: 'Error al eliminar la calificación: ${response.body}');
     }
   }
 
-  Future<List<MovieModel>> getRatedMovies(String sessionId, int accountId) async {
+  Future<List<RatedMovieModel>> getRatedMovies(
+      String token, int userId) async {
     try {
-      final url = Uri.parse('$_baseUrl/account/$accountId/rated/movies').replace(queryParameters: {
-        'api_key': _apiKey,
-        'session_id': sessionId,
-        'language': 'es-ES',
-        'sort_by': 'created_at.desc',
-      });
+      final url = Uri.parse('$_baseUrl/users/$userId/ratings');
 
       final response = await _client.get(
         url,
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> results = data['results'] as List<dynamic>;
+        final List<dynamic> results = json.decode(response.body);
         return results
-            .map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>))
+            .map((ratingJson) =>
+            RatedMovieModel.fromJson(ratingJson as Map<String, dynamic>))
             .toList();
       } else {
         throw ServerException(

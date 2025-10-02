@@ -1,24 +1,29 @@
 import '../../../../core/error/failures.dart';
-import '../../data/models/auth_response_model.dart';
+import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
 
-class LoginUser {
+class RegisterUser {
   final AuthRepository _repository;
 
-  LoginUser(this._repository);
+  RegisterUser(this._repository);
 
-  Future<(AuthResponseModel?, Failure?)> call({
+  Future<(User?, Failure?)> call({
     required String username,
+    required String email,
     required String password,
   }) async {
     if (username.trim().isEmpty) {
       return (null, ValidationFailure(message: 'El nombre de usuario es requerido'));
     }
+    if (email.trim().isEmpty) {
+      return (null, ValidationFailure(message: 'El correo es requerido'));
+    }
     if (password.trim().isEmpty) {
       return (null, ValidationFailure(message: 'La contraseña es requerida'));
     }
-    return await _repository.login(
+    return await _repository.register(
       username: username.trim(),
+      email: email.trim(),
       password: password,
     );
   }

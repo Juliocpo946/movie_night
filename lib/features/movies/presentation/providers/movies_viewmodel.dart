@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/datasources/remote/movie_remote_datasource.dart';
 import '../../data/repositories/movie_repository_impl.dart';
-import '../../../../shared/domain/entities/movie.dart'; // Corregido
+import '../../../../shared/domain/entities/movie.dart';
 import '../../../auth/domain/entities/user.dart';
+import '../../domain/entities/rated_movie.dart';
 import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
 import '../../domain/usecases/add_rating.dart';
@@ -81,12 +82,11 @@ class MoviesViewModel extends ChangeNotifier {
   Future<void> _fetchRatedMovies() async {
     if (_sessionId == null || _currentUser?.id == null) return;
     try {
-      final ratedMoviesList = await _getRatedMovies(_sessionId!, _currentUser!.id!);
+      final List<RatedMovie> ratedMoviesList =
+      await _getRatedMovies(_sessionId!, _currentUser!.id!);
       _ratedMovies.clear();
-      for (var movie in ratedMoviesList) {
-        if (movie.rating != null) {
-          _ratedMovies[movie.id] = movie.rating!;
-        }
+      for (var ratedMovie in ratedMoviesList) {
+        _ratedMovies[ratedMovie.movieId] = ratedMovie.rating;
       }
       notifyListeners();
     } catch (e) {
@@ -95,11 +95,11 @@ class MoviesViewModel extends ChangeNotifier {
   }
 
   Future<void> rateMovie(int movieId, double rating) async {
-    if (_sessionId == null) return;
+    if (_sessionId == null || _currentUser?.id == null) return;
     _ratedMovies[movieId] = rating;
     notifyListeners();
     try {
-      await _addRating(_sessionId!, movieId, rating);
+      await _addRating(_sessionId!, _currentUser!.id!, movieId, rating);
     } catch (e) {
       _ratedMovies.remove(movieId);
       _setError(e.toString());
@@ -108,12 +108,12 @@ class MoviesViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteMovieRating(int movieId) async {
-    if (_sessionId == null) return;
+    if (_sessionId == null || _currentUser?.id == null) return;
     final originalRating = _ratedMovies[movieId];
     _ratedMovies.remove(movieId);
     notifyListeners();
     try {
-      await _deleteRating(_sessionId!, movieId);
+      await _deleteRating(_sessionId!, _currentUser!.id!, movieId);
     } catch (e) {
       if (originalRating != null) {
         _ratedMovies[movieId] = originalRating;

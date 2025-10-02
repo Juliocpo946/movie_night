@@ -8,13 +8,13 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   FavoritesRepositoryImpl(this.remoteDatasource);
 
   @override
-  Future<void> markAsFavorite(int accountId, String sessionId, int movieId, bool isFavorite) async {
-    await remoteDatasource.markAsFavorite(accountId, sessionId, movieId, isFavorite);
+  Future<void> markAsFavorite(String token, int userId, int movieId, bool isFavorite) async {
+    await remoteDatasource.markAsFavorite(token, userId, movieId, isFavorite);
   }
 
   @override
-  Future<List<Movie>> getFavorites(int accountId, String sessionId) async {
-    final movieModels = await remoteDatasource.getFavoriteMovies(accountId, sessionId);
+  Future<List<Movie>> getFavorites(String token, int userId) async {
+    final movieModels = await remoteDatasource.getFavoriteMovies(token, userId);
     return movieModels.map((model) => model.toEntity()).toList();
   }
 }

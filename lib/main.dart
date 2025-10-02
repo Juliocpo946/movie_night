@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'core/config/app_router.dart';
 import 'core/config/app_theme.dart';
 import 'features/auth/presentation/providers/login_viewmodel.dart';
+import 'features/auth/presentation/providers/register_viewmodel.dart';
 import 'features/favorites/presentation/providers/favorites_viewmodel.dart';
 import 'features/movies/presentation/providers/movies_viewmodel.dart';
 
@@ -27,16 +28,18 @@ class MyApp extends StatelessWidget {
           create: (context) => LoginViewModel(),
         ),
         ChangeNotifierProvider(
+          create: (context) => RegisterViewModel(),
+        ),
+        ChangeNotifierProvider(
           create: (context) => MoviesViewModel(),
         ),
         ChangeNotifierProxyProvider<MoviesViewModel, FavoritesViewModel>(
           create: (context) => FavoritesViewModel(),
           update: (context, moviesViewModel, favoritesViewModel) {
-            favoritesViewModel!
-              .updateCredentials(
-                user: moviesViewModel.currentUser,
-                sessionId: moviesViewModel.sessionId,
-              );
+            favoritesViewModel!.updateCredentials(
+              user: moviesViewModel.currentUser,
+              sessionId: moviesViewModel.sessionId,
+            );
             return favoritesViewModel;
           },
         ),

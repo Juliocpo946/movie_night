@@ -6,7 +6,7 @@ class GetFavorites {
 
   GetFavorites(this.repository);
 
-  Future<List<Movie>> call(int accountId, String sessionId) async {
-    return await repository.getFavorites(accountId, sessionId);
+  Future<List<Movie>> call(String token, int userId) async {
+    return await repository.getFavorites(token, userId);
   }
 }

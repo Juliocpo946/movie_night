@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
-import '../../domain/usecases/login_user.dart';
-import '../../../movies/presentation/providers/movies_viewmodel.dart';
+import '../../domain/usecases/register_user.dart';
 
-class LoginViewModel extends ChangeNotifier {
-  late final LoginUser _loginUser;
+class RegisterViewModel extends ChangeNotifier {
+  late final RegisterUser _registerUser;
 
   bool _isLoading = false;
   String? _errorMessage;
 
-  LoginViewModel() {
-    _initializeUseCases();
-  }
-
-  void _initializeUseCases() {
+  RegisterViewModel() {
     final remoteDatasource = AuthRemoteDatasource();
     final repository = AuthRepositoryImpl(remoteDatasource);
-    _loginUser = LoginUser(repository);
+    _registerUser = RegisterUser(repository);
   }
 
   bool get isLoading => _isLoading;
@@ -31,32 +24,30 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> login({
+  Future<void> register({
     required BuildContext context,
     required String username,
+    required String email,
     required String password,
   }) async {
     _setLoading(true);
-    _clearError();
+    clearError();
 
-    final (authResponse, loginFailure) = await _loginUser.call(
+    final (user, failure) = await _registerUser.call(
       username: username,
+      email: email,
       password: password,
     );
 
     _setLoading(false);
 
-    if (loginFailure != null) {
-      _setError(loginFailure.message);
-      return;
-    }
-
-    if (authResponse != null) {
-      final user = authResponse.toEntity();
-      final moviesViewModel = context.read<MoviesViewModel>();
-      moviesViewModel.setSessionId(authResponse.accessToken);
-      moviesViewModel.setCurrentUser(user);
-      context.go('/movies');
+    if (failure != null) {
+      _setError(failure.message);
+    } else if (user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario creado con éxito')),
+      );
+      context.go('/login');
     }
   }
 
@@ -67,9 +58,6 @@ class LoginViewModel extends ChangeNotifier {
 
   void _setError(String error) {
     _errorMessage = error;
-  }
-
-  void _clearError() {
-    _errorMessage = null;
+    notifyListeners();
   }
 }

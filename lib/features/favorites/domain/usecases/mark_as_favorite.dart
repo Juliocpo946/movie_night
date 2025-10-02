@@ -5,7 +5,7 @@ class MarkAsFavorite {
 
   MarkAsFavorite(this.repository);
 
-  Future<void> call(int accountId, String sessionId, int movieId, bool isFavorite) async {
-    await repository.markAsFavorite(accountId, sessionId, movieId, isFavorite);
+  Future<void> call(String token, int userId, int movieId, bool isFavorite) async {
+    await repository.markAsFavorite(token, userId, movieId, isFavorite);
   }
 }

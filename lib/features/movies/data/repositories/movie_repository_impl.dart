@@ -1,4 +1,5 @@
 import '../../../../shared/domain/entities/movie.dart';
+import '../../domain/entities/rated_movie.dart';
 import '../../domain/repositories/movie_repository.dart';
 import '../datasources/remote/movie_remote_datasource.dart';
 
@@ -20,7 +21,8 @@ class MovieRepositoryImpl implements MovieRepository {
   @override
   Future<List<Movie>> searchMovies(String query, {int page = 1}) async {
     try {
-      final movieModels = await _remoteDatasource.searchMovies(query, page: page);
+      final movieModels =
+      await _remoteDatasource.searchMovies(query, page: page);
       return movieModels.map((model) => model.toEntity()).toList();
     } catch (e) {
       throw Exception('Error al buscar películas: ${e.toString()}');
@@ -28,20 +30,22 @@ class MovieRepositoryImpl implements MovieRepository {
   }
 
   @override
-  Future<void> addRating(String sessionId, int movieId, double rating) async {
-    await _remoteDatasource.addRating(sessionId, movieId, rating);
+  Future<void> addRating(
+      String token, int userId, int movieId, double rating) async {
+    await _remoteDatasource.addRating(token, userId, movieId, rating);
   }
 
   @override
-  Future<void> deleteRating(String sessionId, int movieId) async {
-    await _remoteDatasource.deleteRating(sessionId, movieId);
+  Future<void> deleteRating(String token, int userId, int movieId) async {
+    await _remoteDatasource.deleteRating(token, userId, movieId);
   }
 
   @override
-  Future<List<Movie>> getRatedMovies(String sessionId, int accountId) async {
+  Future<List<RatedMovie>> getRatedMovies(String token, int userId) async {
     try {
-      final movieModels = await _remoteDatasource.getRatedMovies(sessionId, accountId);
-      return movieModels.map((model) => model.toEntity()).toList();
+      final ratedMovieModels =
+      await _remoteDatasource.getRatedMovies(token, userId);
+      return ratedMovieModels;
     } catch (e) {
       throw Exception('Error al obtener películas calificadas: ${e.toString()}');
     }

@@ -1,4 +1,4 @@
-import '../../../../shared/domain/entities/movie.dart';
+import '../entities/rated_movie.dart';
 import '../repositories/movie_repository.dart';
 
 class GetRatedMovies {
@@ -6,7 +6,7 @@ class GetRatedMovies {
 
   GetRatedMovies(this.repository);
 
-  Future<List<Movie>> call(String sessionId, int accountId) async {
-    return await repository.getRatedMovies(sessionId, accountId);
+  Future<List<RatedMovie>> call(String token, int userId) async {
+    return await repository.getRatedMovies(token, userId);
   }
 }

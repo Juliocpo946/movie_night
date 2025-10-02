@@ -1,30 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../core/config/app_theme.dart';
-import '../providers/login_viewmodel.dart';
+import '../providers/register_viewmodel.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -32,6 +27,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Crear Cuenta'),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -41,14 +39,12 @@ class _LoginViewState extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeader(),
-                const SizedBox(height: 40),
                 _buildUsernameField(),
+                const SizedBox(height: 16),
+                _buildEmailField(),
                 const SizedBox(height: 16),
                 _buildPasswordField(),
                 const SizedBox(height: 24),
-                _buildLoginButton(),
-                const SizedBox(height: 16),
                 _buildRegisterButton(),
                 const SizedBox(height: 16),
                 _buildErrorMessage(),
@@ -57,32 +53,6 @@ class _LoginViewState extends State<LoginView> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Icon(
-          Icons.movie_outlined,
-          size: 80,
-          color: AppTheme.vibrantAmber,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Noche de Cine',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            color: AppTheme.vibrantAmber,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Inicia sesión o crea una cuenta',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      ],
     );
   }
 
@@ -96,6 +66,22 @@ class _LoginViewState extends State<LoginView> {
       validator: (value) {
         if (value?.isEmpty ?? true) {
           return 'El nombre de usuario es requerido';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      decoration: const InputDecoration(
+        labelText: 'Correo electrónico',
+        prefixIcon: Icon(Icons.email_outlined),
+      ),
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'El correo es requerido';
         }
         return null;
       },
@@ -129,36 +115,27 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  Widget _buildLoginButton() {
-    return Consumer<LoginViewModel>(
-      builder: (context, loginViewModel, child) {
+  Widget _buildRegisterButton() {
+    return Consumer<RegisterViewModel>(
+      builder: (context, registerViewModel, child) {
         return ElevatedButton(
-          onPressed: loginViewModel.isLoading ? null : _handleLogin,
-          child: loginViewModel.isLoading
+          onPressed: registerViewModel.isLoading ? null : _handleRegister,
+          child: registerViewModel.isLoading
               ? const SizedBox(
             height: 20,
             width: 20,
             child: CircularProgressIndicator(strokeWidth: 2),
           )
-              : const Text('Iniciar Sesión'),
+              : const Text('Crear Cuenta'),
         );
       },
     );
   }
 
-  Widget _buildRegisterButton() {
-    return TextButton(
-      onPressed: () {
-        context.go('/register');
-      },
-      child: const Text('¿No tienes una cuenta? Créala aquí'),
-    );
-  }
-
   Widget _buildErrorMessage() {
-    return Consumer<LoginViewModel>(
-      builder: (context, loginViewModel, child) {
-        if (loginViewModel.errorMessage != null) {
+    return Consumer<RegisterViewModel>(
+      builder: (context, registerViewModel, child) {
+        if (registerViewModel.errorMessage != null) {
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -172,13 +149,13 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    loginViewModel.errorMessage!,
+                    registerViewModel.errorMessage!,
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: loginViewModel.clearError,
+                  onPressed: registerViewModel.clearError,
                 ),
               ],
             ),
@@ -189,11 +166,12 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  void _handleLogin() {
+  void _handleRegister() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<LoginViewModel>().login(
+      context.read<RegisterViewModel>().register(
         context: context,
         username: _usernameController.text,
+        email: _emailController.text,
         password: _passwordController.text,
       );
     }

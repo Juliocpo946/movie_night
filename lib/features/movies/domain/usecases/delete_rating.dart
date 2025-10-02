@@ -5,7 +5,7 @@ class DeleteRating {
 
   DeleteRating(this.repository);
 
-  Future<void> call(String sessionId, int movieId) async {
-    await repository.deleteRating(sessionId, movieId);
+  Future<void> call(String token, int userId, int movieId) async {
+    await repository.deleteRating(token, userId, movieId);
   }
 }

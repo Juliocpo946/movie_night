@@ -65,7 +65,8 @@ class FavoritesViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _markAsFavorite(_currentUser!.id!, _sessionId!, movie.id, !isCurrentlyFavorite);
+      await _markAsFavorite(
+          _sessionId!, _currentUser!.id!, movie.id, !isCurrentlyFavorite);
     } catch (e) {
       _favoriteMovies = originalFavorites;
       _failure = ServerFailure(message: e.toString());
@@ -76,7 +77,7 @@ class FavoritesViewModel extends ChangeNotifier {
   Future<void> fetchFavorites() async {
     if (_sessionId == null || _currentUser?.id == null) return;
     try {
-      final favorites = await _getFavorites(_currentUser!.id!, _sessionId!);
+      final favorites = await _getFavorites(_sessionId!, _currentUser!.id!);
       _favoriteMovies = favorites;
       _failure = null;
     } catch (e) {
