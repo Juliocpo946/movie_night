@@ -113,6 +113,35 @@ class MovieRemoteDatasource {
     }
   }
 
+  Future<List<MovieModel>> getRatedMovies(String sessionId, int accountId) async {
+    try {
+      final url = Uri.parse('$_baseUrl/account/$accountId/rated/movies').replace(queryParameters: {
+        'api_key': _apiKey,
+        'session_id': sessionId,
+        'language': 'es-ES',
+        'sort_by': 'created_at.desc',
+      });
+
+      final response = await _client.get(
+        url,
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> results = data['results'] as List<dynamic>;
+        return results
+            .map((movieJson) => MovieModel.fromJson(movieJson as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw ServerException(
+            message: 'Error ${response.statusCode}: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw ServerException(message: 'Error de conexión: ${e.toString()}');
+    }
+  }
+
   void dispose() {
     _client.close();
   }

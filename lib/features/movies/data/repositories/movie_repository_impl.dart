@@ -36,4 +36,14 @@ class MovieRepositoryImpl implements MovieRepository {
   Future<void> deleteRating(String sessionId, int movieId) async {
     await _remoteDatasource.deleteRating(sessionId, movieId);
   }
+
+  @override
+  Future<List<Movie>> getRatedMovies(String sessionId, int accountId) async {
+    try {
+      final movieModels = await _remoteDatasource.getRatedMovies(sessionId, accountId);
+      return movieModels.map((model) => model.toEntity()).toList();
+    } catch (e) {
+      throw Exception('Error al obtener películas calificadas: ${e.toString()}');
+    }
+  }
 }

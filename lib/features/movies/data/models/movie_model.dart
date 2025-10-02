@@ -16,6 +16,7 @@ class MovieModel extends Movie {
     required super.originalTitle,
     required super.popularity,
     required super.video,
+    required super.rating,
   });
 
   factory MovieModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +38,7 @@ class MovieModel extends Movie {
       originalTitle: json['original_title'] as String? ?? '',
       popularity: (json['popularity'] as num?)?.toDouble() ?? 0.0,
       video: json['video'] as bool? ?? false,
+      rating: (json['rating'] as num?)?.toDouble(),
     );
   }
 
@@ -75,6 +77,7 @@ class MovieModel extends Movie {
       originalTitle: originalTitle,
       popularity: popularity,
       video: video,
+      rating: rating,
     );
   }
 }

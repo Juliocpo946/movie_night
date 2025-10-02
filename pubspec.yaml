@@ -17,6 +17,9 @@ dependencies:
   # Bloqueo de Captura de Pantalla (Android)
   #no_screenshot: ^0.3.1
 
+  #Carrusel de cards
+  #carousel_slider: ^4.2.1
+
   # Navegación
   go_router: ^14.1.0
 

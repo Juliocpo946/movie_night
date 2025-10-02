@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           create: (context) => FavoritesViewModel(),
           update: (context, moviesViewModel, favoritesViewModel) {
             favoritesViewModel!
-              ..updateCredentials(
+              .updateCredentials(
                 user: moviesViewModel.currentUser,
                 sessionId: moviesViewModel.sessionId,
               );

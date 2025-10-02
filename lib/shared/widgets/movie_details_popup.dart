@@ -95,7 +95,7 @@ class MovieDetailsPopup extends StatelessWidget {
                 builder: (context, viewModel, child) {
                   final isFavorite = viewModel.isFavorite(movie);
                   return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 100),
                     transitionBuilder: (child, animation) {
                       return ScaleTransition(scale: animation, child: child);
                     },
@@ -150,7 +150,7 @@ class MovieDetailsPopup extends StatelessWidget {
   Widget _buildRatingInfo() {
     return Row(
       children: [
-        const Icon(Icons.star, color: AppTheme.vibrantAmber, size: 20),
+        const Icon(Icons.star, color: AppTheme.vibrantAmber, size: 15),
         const SizedBox(width: 4),
         Text(
           movie.formattedRating,
@@ -207,8 +207,9 @@ class MovieDetailsPopup extends StatelessWidget {
                   children: List.generate(5, (index) {
                     final ratingValue = (index + 1) * 2.0;
                     return IconButton(
-                      iconSize: 28,
-                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      iconSize: 20,
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
                       constraints: const BoxConstraints(),
                       icon: Icon(
                         userRating != null && userRating >= ratingValue

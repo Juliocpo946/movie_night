@@ -5,6 +5,7 @@ import '../../../../core/config/app_theme.dart';
 import '../../../favorites/presentation/providers/favorites_viewmodel.dart';
 import '../providers/movies_viewmodel.dart';
 import '../widgets/movie_grid.dart';
+import '../widgets/popular_movies_carousel.dart';
 import '../widgets/search_bar_widget.dart';
 
 class MoviesView extends StatefulWidget {
@@ -15,11 +16,11 @@ class MoviesView extends StatefulWidget {
 }
 
 class _MoviesViewState extends State<MoviesView> {
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Se obtienen los favoritos al iniciar la pantalla
       context.read<FavoritesViewModel>().fetchFavorites();
     });
   }
@@ -38,11 +39,12 @@ class _MoviesViewState extends State<MoviesView> {
           await context.read<MoviesViewModel>().refresh();
           await context.read<FavoritesViewModel>().fetchFavorites();
         },
-        child: CustomScrollView(
+        child: const CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: _buildSearchSection()),
-            SliverToBoxAdapter(child: _buildErrorMessage()),
-            const MovieGrid(),
+            SliverToBoxAdapter(child: SearchBarWidget()),
+            SliverToBoxAdapter(child: PopularMoviesCarousel()),
+            SliverToBoxAdapter(child: _ErrorMessage()),
+            MovieGrid(),
           ],
         ),
       ),
@@ -51,15 +53,15 @@ class _MoviesViewState extends State<MoviesView> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      title: Row(
+      title: const Row(
         children: [
-          const Icon(
+          Icon(
             Icons.movie_outlined,
             color: AppTheme.vibrantAmber,
             size: 28,
           ),
-          const SizedBox(width: 8),
-          const Text('Noche de Cine'),
+          SizedBox(width: 8),
+          Text('Noche de Cine'),
         ],
       ),
       actions: [
@@ -89,26 +91,15 @@ class _MoviesViewState extends State<MoviesView> {
               itemBuilder: (context) => [
                 PopupMenuItem(
                   enabled: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        moviesViewModel.currentUser?.name ?? 'Usuario',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.pureWhite,
-                        ),
-                      ),
-                      Text(
-                        moviesViewModel.currentUser?.email ?? '',
-                        style: const TextStyle(
-                          color: AppTheme.lightGray,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    moviesViewModel.currentUser?.name ?? 'Usuario',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.pureWhite,
+                    ),
                   ),
                 ),
+                // --- FIN DE LA CORRECCIÓN ---
                 const PopupMenuDivider(),
                 const PopupMenuItem(
                   value: 'logout',
@@ -127,15 +118,14 @@ class _MoviesViewState extends State<MoviesView> {
       ],
     );
   }
+}
 
-  Widget _buildSearchSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: const SearchBarWidget(),
-    );
-  }
+// Se ha movido la lógica del mensaje de error a su propio widget para mejorar la legibilidad.
+class _ErrorMessage extends StatelessWidget {
+  const _ErrorMessage();
 
-  Widget _buildErrorMessage() {
+  @override
+  Widget build(BuildContext context) {
     return Consumer<MoviesViewModel>(
       builder: (context, moviesViewModel, child) {
         if (moviesViewModel.errorMessage != null) {

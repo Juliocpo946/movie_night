@@ -15,6 +15,7 @@ class Movie {
   final String originalTitle;
   final double popularity;
   final bool video;
+  final double? rating;
 
   const Movie({
     required this.id,
@@ -31,6 +32,7 @@ class Movie {
     required this.originalTitle,
     required this.popularity,
     required this.video,
+    required this.rating,
   });
 
   String get fullPosterUrl => '${AppConstants.imageBaseUrl}w500$posterPath';

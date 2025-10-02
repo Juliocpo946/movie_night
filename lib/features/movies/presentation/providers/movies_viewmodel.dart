@@ -9,12 +9,14 @@ import '../../domain/usecases/get_popular_movies.dart';
 import '../../domain/usecases/search_movies.dart';
 import '../../domain/usecases/add_rating.dart';
 import '../../domain/usecases/delete_rating.dart';
+import '../../domain/usecases/get_rated_movies.dart';
 
 class MoviesViewModel extends ChangeNotifier {
   late final GetPopularMovies _getPopularMovies;
   late final SearchMovies _searchMovies;
   late final AddRating _addRating;
   late final DeleteRating _deleteRating;
+  late final GetRatedMovies _getRatedMovies;
 
   User? _currentUser;
   String? _sessionId;
@@ -40,6 +42,7 @@ class MoviesViewModel extends ChangeNotifier {
     _searchMovies = SearchMovies(repository);
     _addRating = AddRating(repository);
     _deleteRating = DeleteRating(repository);
+    _getRatedMovies = GetRatedMovies(repository);
   }
 
   User? get currentUser => _currentUser;
@@ -55,6 +58,7 @@ class MoviesViewModel extends ChangeNotifier {
 
   void setCurrentUser(User user) {
     _currentUser = user;
+    _fetchRatedMovies();
     notifyListeners();
   }
 
@@ -72,6 +76,22 @@ class MoviesViewModel extends ChangeNotifier {
     _searchQuery = '';
     notifyListeners();
     context.go('/login');
+  }
+
+  Future<void> _fetchRatedMovies() async {
+    if (_sessionId == null || _currentUser?.id == null) return;
+    try {
+      final ratedMoviesList = await _getRatedMovies(_sessionId!, _currentUser!.id!);
+      _ratedMovies.clear();
+      for (var movie in ratedMoviesList) {
+        if (movie.rating != null) {
+          _ratedMovies[movie.id] = movie.rating!;
+        }
+      }
+      notifyListeners();
+    } catch (e) {
+      _setError("No se pudieron cargar tus calificaciones.");
+    }
   }
 
   Future<void> rateMovie(int movieId, double rating) async {
@@ -169,6 +189,7 @@ class MoviesViewModel extends ChangeNotifier {
 
   Future<void> refresh() async {
     await loadPopularMovies();
+    await _fetchRatedMovies();
   }
 
   void _setLoading(bool loading) {
