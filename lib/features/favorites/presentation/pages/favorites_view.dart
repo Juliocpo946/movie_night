@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/config/app_theme.dart';
+import '../../../../shared/widgets/movie_poster_card.dart';
 import '../providers/favorites_viewmodel.dart';
-import '../widgets/favorite_movie_poster_card.dart';
 
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
@@ -50,7 +50,7 @@ class FavoritesView extends StatelessWidget {
             itemCount: favoritesViewModel.favoriteMovies.length,
             itemBuilder: (context, index) {
               final movie = favoritesViewModel.favoriteMovies[index];
-              return FavoriteMoviePosterCard(movie: movie);
+              return MoviePosterCard(movie: movie);
             },
           );
         },

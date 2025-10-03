@@ -1,4 +1,4 @@
-import '../../domain/entities/favorite_movie.dart';
+import '../../../movies/domain/entities/movie.dart';
 import '../../domain/repositories/favorites_repository.dart';
 import '../datasources/favorites_remote_datasource.dart';
 
@@ -13,7 +13,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<List<FavoriteMovie>> getFavorites(String token, int userId) async {
+  Future<List<Movie>> getFavorites(String token, int userId) async {
     final movieModels = await remoteDatasource.getFavoriteMovies(token, userId);
     return movieModels.map((model) => model.toEntity()).toList();
   }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../shared/domain/entities/user.dart';
+import '../../../movies/domain/entities/movie.dart';
 import '../../data/datasources/favorites_remote_datasource.dart';
 import '../../data/repositories/favorites_repository_impl.dart';
-import '../../domain/entities/favorite_movie.dart';
 import '../../domain/usecases/get_favorites_usecase.dart';
 import '../../domain/usecases/mark_as_favorite_usecase.dart';
 
@@ -13,7 +13,7 @@ class FavoritesViewModel extends ChangeNotifier {
 
   User? _currentUser;
   String? _sessionId;
-  List<FavoriteMovie> _favoriteMovies = [];
+  List<Movie> _favoriteMovies = [];
   Failure? _failure;
 
   FavoritesViewModel() {
@@ -23,7 +23,7 @@ class FavoritesViewModel extends ChangeNotifier {
     _getFavorites = GetFavoritesUseCase(repository);
   }
 
-  List<FavoriteMovie> get favoriteMovies => _favoriteMovies;
+  List<Movie> get favoriteMovies => _favoriteMovies;
   Failure? get failure => _failure;
 
   void updateCredentials({User? user, String? sessionId}) {
@@ -51,22 +51,22 @@ class FavoritesViewModel extends ChangeNotifier {
     return _favoriteMovies.any((fav) => fav.id == movieId);
   }
 
-  Future<void> toggleFavoriteStatus(int movieId, String title, String posterPath) async {
+  Future<void> toggleFavoriteStatus(Movie movie) async {
     if (_sessionId == null || _currentUser?.id == null) return;
 
-    final isCurrentlyFavorite = isFavorite(movieId);
-    final originalFavorites = List<FavoriteMovie>.from(_favoriteMovies);
+    final isCurrentlyFavorite = isFavorite(movie.id);
+    final originalFavorites = List<Movie>.from(_favoriteMovies);
 
     if (isCurrentlyFavorite) {
-      _favoriteMovies.removeWhere((fav) => fav.id == movieId);
+      _favoriteMovies.removeWhere((fav) => fav.id == movie.id);
     } else {
-      _favoriteMovies.add(FavoriteMovie(id: movieId, title: title, posterPath: posterPath));
+      _favoriteMovies.add(movie);
     }
     notifyListeners();
 
     try {
       await _markAsFavorite(
-          _sessionId!, _currentUser!.id, movieId, !isCurrentlyFavorite);
+          _sessionId!, _currentUser!.id, movie.id, !isCurrentlyFavorite);
     } catch (e) {
       _favoriteMovies = originalFavorites;
       _failure = ServerFailure(message: e.toString());

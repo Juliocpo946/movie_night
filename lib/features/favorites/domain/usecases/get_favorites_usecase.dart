@@ -1,4 +1,4 @@
-import '../entities/favorite_movie.dart';
+import '../../../movies/domain/entities/movie.dart';
 import '../repositories/favorites_repository.dart';
 
 class GetFavoritesUseCase {
@@ -6,7 +6,7 @@ class GetFavoritesUseCase {
 
   GetFavoritesUseCase(this.repository);
 
-  Future<List<FavoriteMovie>> call(String token, int userId) async {
+  Future<List<Movie>> call(String token, int userId) async {
     return await repository.getFavorites(token, userId);
   }
 }

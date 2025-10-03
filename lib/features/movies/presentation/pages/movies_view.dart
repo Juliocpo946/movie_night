@@ -38,12 +38,18 @@ class _MoviesViewState extends State<MoviesView> {
       body: RefreshIndicator(
         onRefresh: () async {
           await context.read<MoviesViewModel>().refresh();
-          await context.read<FavoritesViewModel>().fetchFavorites();
 
+          if (mounted) {
+            await context.read<FavoritesViewModel>().fetchFavorites();
+          }
         },
         child: const CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: SearchBarWidget()),
+            SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SearchBarWidget(),
+                )),
             SliverToBoxAdapter(child: PopularMoviesCarousel()),
             SliverToBoxAdapter(child: _ErrorMessage()),
             MovieGrid(),

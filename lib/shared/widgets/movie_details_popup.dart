@@ -107,7 +107,7 @@ class MovieDetailsPopup extends StatelessWidget {
                         size: 30,
                       ),
                       onPressed: () {
-                        viewModel.toggleFavoriteStatus(movie.id, movie.title, movie.posterPath);
+                        viewModel.toggleFavoriteStatus(movie);
                       },
                     ),
                   );
